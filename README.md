@@ -15,6 +15,6 @@ Please follow the instruction from the link.
 3. lib
   - contains display screens
 ## Useful Link
-[Documentation](https://api.flutter.dev/flutter/material/material-library.html]\n
+[Documentation](https://api.flutter.dev/flutter/material/material-library.html)\n
 [Community library](https://pub.dev/)\n
 [Widget Short Tutorial](https://www.youtube.com/channel/UCwXdFgeE9KYzlDdR7TG9cMw)
