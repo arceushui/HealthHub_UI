@@ -9,12 +9,12 @@ Please follow the instruction from the link.
 3. Every imported library and image assets must be specified in pubspec.yaml.
 ## Directories
 1. assets
-  - to store external images
+  > to store external images
 2. lib/Widget
-  - contains Stateless Widgets
+  > contains Stateless Widgets
 3. lib
-  - contains display screens
+  > contains display screens
 ## Useful Link
-[Documentation](https://api.flutter.dev/flutter/material/material-library.html)\n
-[Community library](https://pub.dev/)\n
+[Documentation](https://api.flutter.dev/flutter/material/material-library.html)<br\>
+[Community library](https://pub.dev/)<br\>
 [Widget Short Tutorial](https://www.youtube.com/channel/UCwXdFgeE9KYzlDdR7TG9cMw)
