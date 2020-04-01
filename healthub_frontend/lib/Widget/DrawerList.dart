@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:healthub_frontend/ProfileScreen.dart';
 import 'package:healthub_frontend/WeightScreen.dart';
 
+import '../MealScreen.dart';
+
 class DrawerList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -49,6 +51,11 @@ class DrawerList extends StatelessWidget {
           ListTile(
             leading: Icon(Icons.fastfood),
             title: Text("Meal"),
+            onTap: () {
+              Navigator.of(context).pop();
+              Navigator.of(context).push(MaterialPageRoute(
+                  builder: (BuildContext context) => MealScreen()));
+            },
           ),
           ListTile(
             leading: Icon(Icons.description),
