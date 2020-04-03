@@ -36,19 +36,19 @@ ListTile _tile(String title, String subtitle, IconData icon) => ListTile(
       ),
     );
 
-class WeightScreen extends StatefulWidget {
+class SleepScreen extends StatefulWidget {
   @override
-  _WeightScreenState createState() => _WeightScreenState();
+  _SleepScreenState createState() => _SleepScreenState();
 }
 
-class _WeightScreenState extends State<WeightScreen> {
+class _SleepScreenState extends State<SleepScreen> {
   @override
   Widget build(BuildContext context) {
     ScreenUtil.instance = ScreenUtil.getInstance()..init(context);
     ScreenUtil.instance = ScreenUtil(allowFontScaling: true);
     return new Scaffold(
       appBar: AppBar(
-        title: Text("Weight"),
+        title: Text("Sleep"),
       ),
       drawer: DrawerList(),
       body: Container(

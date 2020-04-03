@@ -2,6 +2,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/material.dart';
 import 'package:healthub_frontend/ProfileScreen.dart';
 import 'package:healthub_frontend/WeightScreen.dart';
+import 'package:healthub_frontend/ExerciseScreen.dart';
+import 'package:healthub_frontend/SleepScreen.dart';
 
 import '../MealScreen.dart';
 
@@ -17,7 +19,8 @@ class DrawerList extends StatelessWidget {
             accountEmail: Text("lgndhui@gmail.com"),
             currentAccountPicture: CircleAvatar(
               backgroundColor: Colors.white,
-              child: Icon(Icons.person,
+              child: Icon(
+                Icons.person,
                 size: ScreenUtil.instance.setSp(100),
               ),
             ),
@@ -42,11 +45,21 @@ class DrawerList extends StatelessWidget {
           ),
           ListTile(
             leading: Icon(Icons.directions_run),
-            title: Text("Activity"),
+            title: Text("Exercise"),
+            onTap: () {
+              Navigator.of(context).pop();
+              Navigator.of(context).push(MaterialPageRoute(
+                  builder: (BuildContext context) => ExerciseScreen()));
+            },
           ),
           ListTile(
             leading: Icon(Icons.event_seat),
-            title: Text("Sleeping"),
+            title: Text("Sleep"),
+            onTap: () {
+              Navigator.of(context).pop();
+              Navigator.of(context).push(MaterialPageRoute(
+                  builder: (BuildContext context) => SleepScreen()));
+            },
           ),
           ListTile(
             leading: Icon(Icons.fastfood),
