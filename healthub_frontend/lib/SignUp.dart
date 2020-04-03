@@ -1,3 +1,5 @@
+import 'package:get_it/get_it.dart';
+import 'package:healthub_frontend/Service/signup_service.dart';
 import 'package:healthub_frontend/main.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -17,6 +19,9 @@ class SignUp extends StatefulWidget {
 }
 
 class _MyAppState extends State<SignUp> {
+
+  SignupService get notesService => GetIt.I<SignupService>();
+
   var _formkey = GlobalKey<FormState>();
 
   Future<int> getUser(body) async{
