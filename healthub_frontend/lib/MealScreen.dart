@@ -56,7 +56,7 @@ class _MealScreenState extends State<MealScreen> {
                           width: 100.0,
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(10.0),
-                            color: choose == true & (index == choose_index)? Colors.white :  Colors.blue,
+                            color: choose == true && (index == choose_index)? Colors.white :  Colors.blue,
                           ),
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -67,15 +67,16 @@ class _MealScreenState extends State<MealScreen> {
                                     child: Text(
                                       new DateFormat.yMMMd().format(date[index]).toString(),
                                       style: TextStyle(
-                                          color: choose == true & (index == choose_index)? Colors.blue : Colors.white,
+                                          color: choose == true && (index == choose_index)? Colors.blue : Colors.white,
                                           fontSize: 24.0,
                                           fontWeight: FontWeight.w600),
                                     ),
                                     onTap: (){
                                       setState(() {
                                         choose_index = index;
-                                        choose=true;
+
                                       });
+                                      choose=true;
                                     },
                                   )
                             )

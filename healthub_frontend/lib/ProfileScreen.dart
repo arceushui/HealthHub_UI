@@ -1,9 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get_it/get_it.dart';
+import 'package:healthub_frontend/Model/Profile.dart';
 import 'package:healthub_frontend/Widget/SaveAlertDialog.dart';
 import 'package:healthub_frontend/Widget/DrawerList.dart';
 
+import 'Model/api_response.dart';
+import 'Service/profile_service.dart';
+
 class ProfileScreen extends StatefulWidget {
+  final String id;
+
+  ProfileScreen({@required this.id});
   @override
   _ProfileScreenState createState() => _ProfileScreenState();
 }
@@ -11,6 +19,25 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
 
   var _formkey = GlobalKey<FormState>();
+
+  ProfileService get profileService => GetIt.I<ProfileService>();
+
+  APIResponse<Profile> _apiResponse;
+
+
+  @override
+  void initState() {
+    _getProfile();
+    super.initState();
+  }
+
+
+
+  _getProfile() async {
+
+    _apiResponse= await profileService.getProfile(widget.id);
+
+  }
 
   int _selectedGender = 0;
   List<DropdownMenuItem<int>> genderList = [];

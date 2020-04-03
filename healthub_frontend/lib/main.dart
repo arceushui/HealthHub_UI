@@ -1,17 +1,23 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get_it/get_it.dart';
 import 'package:healthub_frontend/ProfileScreen.dart';
+import 'Model/login.dart';
+import 'Service/login_service.dart';
 import 'SignUp.dart';
-import 'package:http/http.dart' as http;
-import 'dart:async';
-import 'dart:convert';
 
+void setupLocator() {
+  GetIt.I.registerLazySingleton(() => LoginService());
+}
 
-void main() => runApp(MaterialApp(
-  home: MyApp(),
-  debugShowCheckedModeBanner: false,
-));
+void main() {
+  setupLocator();
+  runApp(MaterialApp(
+    home: MyApp(),
+    debugShowCheckedModeBanner: false,
+  ));
+}
 
 class MyApp extends StatefulWidget {
   // This widget is the root of your application.
@@ -27,13 +33,7 @@ class _MyAppState extends State<MyApp> {
   TextEditingController usernameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
 
-  Future<int> getUser(body) async{
-    print(body);
-    http.Response response = await http.post('http://10.0.2.2:7000/api/user/login', body: body,headers: {"Content-Type": "application/json"},);
-    print(response.body);
-    print(response.statusCode);
-    return response.statusCode;
-  }
+  LoginService get loginService => GetIt.I<LoginService>();
 
   void _radio(){
     setState(() {
@@ -246,15 +246,15 @@ class _MyAppState extends State<MyApp> {
                                 color: Colors.transparent,
                                 child: InkWell(
                                   onTap: () async{
-                                    var body;
-                                    /*List listdata;
+                                    final user = Login(
+                                        username: usernameController.text,
+                                        password: passwordController.text
+                                    );
 
-                                    listdata = listData();
-                                    body = User(username: listdata[0], password: listdata[1]).encoder();
-                                    final error=await getUser(body);
-*/
-                                    var error=200;
-                                    if(error==422){
+                                    final result = await loginService.login(user);
+                                    final id = await loginService.sendId(user);
+
+                                    if(result.error){
                                       showDialog(
                                           context: context,
                                           barrierDismissible: true,
@@ -276,7 +276,7 @@ class _MyAppState extends State<MyApp> {
                                     }
                                     else{
                                       Navigator.push(context, MaterialPageRoute(
-                                          builder: (context) => ProfileScreen()
+                                          builder: (context) => ProfileScreen(id: id.data)
                                       ),);
                                     }
                                   },
