@@ -63,7 +63,7 @@ class DrawerList extends StatelessWidget {
           ),
           ListTile(
             leading: Icon(Icons.fastfood),
-            title: Text("Meal"),
+            title: Text("Diet"),
             onTap: () {
               Navigator.of(context).pop();
               Navigator.of(context).push(MaterialPageRoute(
