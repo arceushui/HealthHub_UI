@@ -5,12 +5,14 @@ import 'package:get_it/get_it.dart';
 import 'package:healthub_frontend/ProfileScreen.dart';
 import 'Model/login.dart';
 import 'Service/login_service.dart';
+import 'Service/profile_service.dart';
 import 'Service/signup_service.dart';
 import 'SignUp.dart';
 
 void setupLocator() {
   GetIt.I.registerLazySingleton(() => LoginService());
   GetIt.I.registerLazySingleton(() => SignupService());
+  GetIt.I.registerLazySingleton(() => ProfileService());
 }
 
 void main() {
@@ -32,10 +34,10 @@ class _MyAppState extends State<MyApp> {
   var _formkey = GlobalKey<FormState>();
   var listdata = [];
 
+  LoginService get loginService => GetIt.I<LoginService>();
+
   TextEditingController usernameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
-
-  LoginService get loginService => GetIt.I<LoginService>();
 
   void _radio(){
     setState(() {
@@ -69,6 +71,9 @@ class _MyAppState extends State<MyApp> {
     ScreenUtil.instance = ScreenUtil.getInstance()..init(context);
     ScreenUtil.instance = ScreenUtil(allowFontScaling: true);
     Size size =MediaQuery.of(context).size;
+
+
+
     return new Scaffold(
       body: Stack(
         children: <Widget>[
@@ -260,6 +265,7 @@ class _MyAppState extends State<MyApp> {
                                     print(usernameController.text);
                                     print(passwordController.text);
                                     print(result);
+                                    print(id.data);
                                     if(result.error){
                                       showDialog(
                                           context: context,
@@ -282,6 +288,7 @@ class _MyAppState extends State<MyApp> {
                                     }
                                     else{
                                       Navigator.push(context, MaterialPageRoute(
+
                                           builder: (context) => ProfileScreen(id: id.data)
                                       ),);
                                     }
