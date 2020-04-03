@@ -6,7 +6,7 @@ import 'package:http/http.dart' as http;
 
 class ProfileService {
 
-  static const API = 'http://localhost:8080';
+  static const API = 'http://10.0.2.2:8080';
 
   Future<APIResponse<Profile>> getProfile(String id) {
     return http.get(API + '/healthprofile?id=' + id).then((data) {

@@ -5,10 +5,12 @@ import 'package:get_it/get_it.dart';
 import 'package:healthub_frontend/ProfileScreen.dart';
 import 'Model/login.dart';
 import 'Service/login_service.dart';
+import 'Service/signup_service.dart';
 import 'SignUp.dart';
 
 void setupLocator() {
   GetIt.I.registerLazySingleton(() => LoginService());
+  GetIt.I.registerLazySingleton(() => SignupService());
 }
 
 void main() {
@@ -251,9 +253,13 @@ class _MyAppState extends State<MyApp> {
                                         password: passwordController.text
                                     );
 
+
                                     final result = await loginService.login(user);
                                     final id = await loginService.sendId(user);
 
+                                    print(usernameController.text);
+                                    print(passwordController.text);
+                                    print(result);
                                     if(result.error){
                                       showDialog(
                                           context: context,

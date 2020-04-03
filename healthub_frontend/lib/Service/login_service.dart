@@ -6,14 +6,19 @@ import 'package:http/http.dart' as http;
 
 
 class LoginService {
-  static const API = 'http://localhost:8080';
+  static const API = 'http://10.0.2.2:8080';
+  static const headers = {
+    'Content-Type': 'application/json'
+  };
 
-  Future<APIResponse<bool>> login(Login item) {
-    return http.post(API + '/login', body: json.encode(item.toJson())).then((data) {
-      if (data.statusCode == 200 && data.body != "Error" ) {
-        return APIResponse<bool>(data: true);
+  Future<APIResponse<Object>> login(Login item) {
+    return http.post(API + '/login', headers: headers, body: json.encode(item.toJson())).then((data) {
+      if (data.statusCode == 200 && (data.body == "error")) {
+        return APIResponse<bool>(error: true, errorMessage: 'An error occured');
       }
-      return APIResponse<bool>(error: true, errorMessage: 'An error occured');
+      else{
+        return APIResponse<String>(data: data.body);
+      }
     })
         .catchError((_) => APIResponse<bool>(error: true, errorMessage: 'An error occured'));
   }
