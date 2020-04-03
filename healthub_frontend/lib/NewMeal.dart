@@ -1,5 +1,7 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 
 import 'Widget/SaveAlertDialog.dart';
 
@@ -8,11 +10,70 @@ class NewMeal extends StatefulWidget {
   _NewMealState createState() => _NewMealState();
 }
 
+TextEditingController mealNameController = TextEditingController();
+TextEditingController caloriesController = TextEditingController();
+TextEditingController timestampController = TextEditingController();
+TextEditingController ingredientController = TextEditingController();
+
 class _NewMealState extends State<NewMeal> {
+  var _formkey = GlobalKey<FormState>();
+
+  int _selectedType = 0;
+  List<DropdownMenuItem<int>> typeList = [];
+
+  String _date = "Not set";
+
+  bool _isChecked = true;
+
+  List<String> text = ["Manual Typing"];
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  void loadTypeList() {
+    typeList = [];
+    typeList.add(new DropdownMenuItem(
+      child: new Text('Breakfast'),
+      value: 0,
+    ));
+    typeList.add(new DropdownMenuItem(
+      child: new Text('Lunch'),
+      value: 1,
+    ));
+    typeList.add(new DropdownMenuItem(
+      child: new Text('Dinner'),
+      value: 2,
+    ));
+  }
+
+  Widget getFormWidget() {
+    return new DropdownButton(
+      hint: new Text('Select meal type'),
+      items: typeList,
+      value: _selectedType,
+      onChanged: (value) {
+        setState(() {
+          _selectedType = value;
+        });
+      },
+      isExpanded: true,
+    );
+  }
+
+  void saveMeal() {}
+
+  void cancel() {
+    Navigator.of(context).pop();
+  }
+
   @override
   Widget build(BuildContext context) {
     ScreenUtil.instance = ScreenUtil.getInstance()..init(context);
     ScreenUtil.instance = ScreenUtil(allowFontScaling: true);
+
+    loadTypeList();
 
     return Scaffold(
         appBar: AppBar(
@@ -28,7 +89,7 @@ class _NewMealState extends State<NewMeal> {
                     return SaveAlertDialog(
                         title: "Confirmation Required",
                         content: "Do you want to save changes to profile?",
-                        yesOnPressed: saveProfile,
+                        yesOnPressed: saveMeal,
                         noOnPressed: cancel);
                   },
                 );
@@ -38,32 +99,17 @@ class _NewMealState extends State<NewMeal> {
         ),
         body: Stack(
           children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.only(bottom: 20.0),
-              child: Container(
-                color: Colors.blue,
-                child: Center(
-                    child: CircleAvatar(
-                  backgroundColor: Colors.white,
-                  child: Icon(
-                    Icons.person,
-                    size: ScreenUtil.instance.setSp(100),
-                  ),
-                )),
-                height: ScreenUtil.instance.setSp(500),
-              ),
-            ),
             SingleChildScrollView(
                 child: Padding(
-              padding: EdgeInsets.only(top: 50.0),
+              padding: EdgeInsets.only(top: 10.0),
               child: Column(
                 children: <Widget>[
                   SizedBox(
-                    height: ScreenUtil.getInstance().setHeight(300),
+                    height: ScreenUtil.getInstance().setHeight(10),
                   ),
                   Container(
                       width: double.infinity,
-                      height: ScreenUtil.getInstance().setHeight(1200),
+                      height: ScreenUtil.getInstance().setHeight(2000),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(16.0),
@@ -90,10 +136,12 @@ class _NewMealState extends State<NewMeal> {
                                         alignment: Alignment.centerLeft,
                                         child: Container(
                                           child: Text(
-                                            "Gender",
+                                            "Meal Type",
                                             style: TextStyle(
                                                 fontFamily: "Open Sans",
-                                                color: Colors.black),
+                                                color: Colors.black,
+                                                fontSize: ScreenUtil.instance
+                                                    .setSp(50)),
                                           ),
                                         ),
                                       ),
@@ -103,13 +151,15 @@ class _NewMealState extends State<NewMeal> {
                                       ),
                                       getFormWidget(),
                                       TextFormField(
-                                        controller: ageController,
+                                        controller: mealNameController,
                                         style: TextStyle(color: Colors.black),
                                         decoration: InputDecoration(
-                                          labelText: "Age",
+                                          labelText: "Meal Name",
                                           labelStyle: TextStyle(
                                               fontFamily: "Open Sans",
-                                              color: Colors.black),
+                                              color: Colors.black,
+                                              fontSize: ScreenUtil.instance
+                                                  .setSp(50)),
                                           enabledBorder: UnderlineInputBorder(
                                               borderSide: BorderSide(
                                                   color: Colors.black)),
@@ -117,20 +167,23 @@ class _NewMealState extends State<NewMeal> {
                                               borderSide: BorderSide(
                                                   color: Colors.black)),
                                         ),
-                                        keyboardType: TextInputType.number,
+                                        keyboardType: TextInputType.text,
                                       ),
                                       SizedBox(
                                         height:
                                             ScreenUtil.instance.setHeight(50),
                                       ),
                                       TextFormField(
-                                        controller: heightController,
+                                        enabled: _isChecked,
+                                        controller: caloriesController,
                                         style: TextStyle(color: Colors.black),
                                         decoration: InputDecoration(
-                                          labelText: "Height (cm)",
+                                          labelText: "Calories",
                                           labelStyle: TextStyle(
                                               fontFamily: "Open Sans",
-                                              color: Colors.black),
+                                              color: Colors.black,
+                                              fontSize: ScreenUtil.instance
+                                                  .setSp(50)),
                                           enabledBorder: UnderlineInputBorder(
                                               borderSide: BorderSide(
                                                   color: Colors.black)),
@@ -139,19 +192,173 @@ class _NewMealState extends State<NewMeal> {
                                                   color: Colors.black)),
                                         ),
                                         keyboardType: TextInputType.number,
+                                      ),
+                                      Column(
+                                        children: <Widget>[
+                                          Container(
+                                            height: 60.0,
+                                            child: Column(
+                                              children: text
+                                                  .map((t) => CheckboxListTile(
+                                                        title: Text(t),
+                                                        value: _isChecked,
+                                                        onChanged: (val) {
+                                                          setState(() {
+                                                            _isChecked = val;
+                                                          });
+                                                        },
+                                                      ))
+                                                  .toList(),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      SizedBox(
+                                        height:
+                                            ScreenUtil.instance.setHeight(50),
+                                      ),
+                                      Align(
+                                        alignment: Alignment.centerLeft,
+                                        child: Container(
+                                          child: Text(
+                                            "Meal Date",
+                                            style: TextStyle(
+                                                fontFamily: "Open Sans",
+                                                color: Colors.black,
+                                                fontSize: ScreenUtil.instance
+                                                    .setSp(50)),
+                                          ),
+                                        ),
+                                      ),
+                                      Align(
+                                        alignment: Alignment.centerLeft,
+                                        child: Container(
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(16.0),
+                                            child: Container(
+                                              decoration: BoxDecoration(
+                                                border: Border.all(
+                                                  color: Colors.black,
+                                                  width: 3.0,
+                                                ),
+                                                color: Colors.white,
+                                                borderRadius:
+                                                    BorderRadius.circular(10.0),
+                                              ),
+                                              child: Column(
+                                                mainAxisSize: MainAxisSize.max,
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: <Widget>[
+                                                  RaisedButton(
+                                                    shape:
+                                                        RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        5.0)),
+                                                    onPressed: () {
+                                                      DatePicker.showDatePicker(
+                                                          context,
+                                                          theme:
+                                                              DatePickerTheme(
+                                                            containerHeight:
+                                                                210.0,
+                                                          ),
+                                                          showTitleActions:
+                                                              true,
+                                                          minTime: DateTime(
+                                                              2020, 1, 1),
+                                                          maxTime: DateTime(
+                                                              2030, 12, 31),
+                                                          onConfirm: (date) {
+                                                        print('confirm $date');
+                                                        _date =
+                                                            '${date.year} - ${date.month} - ${date.day}';
+                                                        setState(() {});
+                                                      },
+                                                          currentTime:
+                                                              DateTime.now(),
+                                                          locale:
+                                                              LocaleType.en);
+                                                    },
+                                                    child: Container(
+                                                      alignment:
+                                                          Alignment.center,
+                                                      height: 50.0,
+                                                      child: Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .spaceBetween,
+                                                        children: <Widget>[
+                                                          Row(
+                                                            children: <Widget>[
+                                                              Container(
+                                                                child: Row(
+                                                                  children: <
+                                                                      Widget>[
+                                                                    Icon(
+                                                                      Icons
+                                                                          .date_range,
+                                                                      size:
+                                                                          18.0,
+                                                                      color: Colors
+                                                                          .black,
+                                                                    ),
+                                                                    Text(
+                                                                      " $_date",
+                                                                      style: TextStyle(
+                                                                          color: Colors
+                                                                              .black,
+                                                                          fontWeight: FontWeight
+                                                                              .bold,
+                                                                          fontSize:
+                                                                              18.0),
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                              )
+                                                            ],
+                                                          ),
+                                                          Text(
+                                                            "  Change",
+                                                            style: TextStyle(
+                                                                color: Colors
+                                                                    .black,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                                fontSize: 18.0),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    color: Colors.white,
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        height:
+                                            ScreenUtil.instance.setHeight(50),
                                       ),
                                       SizedBox(
                                         height:
                                             ScreenUtil.instance.setHeight(50),
                                       ),
                                       TextFormField(
-                                        controller: weightController,
+                                        controller: ingredientController,
                                         style: TextStyle(color: Colors.black),
                                         decoration: InputDecoration(
-                                          labelText: "Weight (kg)",
+                                          labelText: "Ingredients",
                                           labelStyle: TextStyle(
                                               fontFamily: "Open Sans",
-                                              color: Colors.black),
+                                              color: Colors.black,
+                                              fontSize: ScreenUtil.instance
+                                                  .setSp(50)),
                                           enabledBorder: UnderlineInputBorder(
                                               borderSide: BorderSide(
                                                   color: Colors.black)),
@@ -159,8 +366,33 @@ class _NewMealState extends State<NewMeal> {
                                               borderSide: BorderSide(
                                                   color: Colors.black)),
                                         ),
-                                        keyboardType: TextInputType.number,
+                                        keyboardType: TextInputType.text,
                                       ),
+                                      RaisedButton(
+                                        onPressed: () {},
+                                        child: Text("ADD"),
+                                      ),
+                                      Container(
+                                          height: 100,
+                                          child: ListView.separated(
+                                            scrollDirection: Axis.horizontal,
+                                            shrinkWrap: true,
+                                            padding: const EdgeInsets.all(8),
+                                            itemCount: 20,
+                                            itemBuilder: (BuildContext context,
+                                                int index) {
+                                              return Container(
+                                                height: 50,
+                                                color: Colors.amber,
+                                                child: Center(
+                                                    child: Text('Entry')),
+                                              );
+                                            },
+                                            separatorBuilder:
+                                                (BuildContext context,
+                                                        int index) =>
+                                                    const Divider(),
+                                          )),
                                     ],
                                   ),
                                 ),

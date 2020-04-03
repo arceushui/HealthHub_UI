@@ -57,7 +57,7 @@ class _MealScreenState extends State<MealScreen> {
                           width: 100.0,
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(10.0),
-                            color: choose == true & (index == choose_index)
+                            color: choose == true && (index == choose_index)
                                 ? Colors.white
                                 : Colors.blue,
                           ),
@@ -72,8 +72,8 @@ class _MealScreenState extends State<MealScreen> {
                                           .format(date[index])
                                           .toString(),
                                       style: TextStyle(
-                                          color: choose ==
-                                                  true & (index == choose_index)
+                                          color: choose == true &&
+                                                  (index == choose_index)
                                               ? Colors.blue
                                               : Colors.white,
                                           fontSize: 24.0,
@@ -82,8 +82,8 @@ class _MealScreenState extends State<MealScreen> {
                                     onTap: () {
                                       setState(() {
                                         choose_index = index;
-                                        choose = true;
                                       });
+                                      choose = true;
                                     },
                                   ))
                             ],
