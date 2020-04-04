@@ -34,6 +34,7 @@ class _WeightScreenState extends State<WeightScreen> {
   List<Weight> weights;
 
   Future<List<Weight>> _getWeights() async {
+    print("id is " + id);
     _apiResponse = await profileService.getProfile(id);
     print(_apiResponse.data);
     return _apiResponse.data.weights;
@@ -46,8 +47,9 @@ class _WeightScreenState extends State<WeightScreen> {
             case ConnectionState.none:
               return new Text('Press button to start');
             case ConnectionState.waiting:
-              return CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.blue));
+              return Center(
+                  child: CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.blue)));
             default:
               if (snapshot.hasError)
                 return new Text('Error: ${snapshot.error}');

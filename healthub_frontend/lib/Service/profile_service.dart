@@ -10,9 +10,10 @@ class ProfileService {
   static const headers = {'Content-Type': 'application/json'};
 
   Future<APIResponse<Profile>> getProfile(String id) {
+    print("HERE");
     return http.get(API + '/healthprofile?id=' + id, headers: headers).then(
         (data) {
-      print(id);
+      print("HERE?" + id);
       print(data.body);
       print(data.statusCode);
       if (data.statusCode == 200) {
