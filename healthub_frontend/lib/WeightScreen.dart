@@ -9,6 +9,8 @@ class WeightScreen extends StatefulWidget {
 }
 
 class _WeightScreenState extends State<WeightScreen> {
+
+
   @override
   Widget build(BuildContext context) {
     ScreenUtil.instance = ScreenUtil.getInstance()..init(context);
@@ -18,8 +20,7 @@ class _WeightScreenState extends State<WeightScreen> {
           title: Text("Weight"),
       ),
       drawer: DrawerList(),
-      body: Container();
-
+      body: Container()
     );
   }
 }

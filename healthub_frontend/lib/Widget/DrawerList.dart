@@ -6,8 +6,14 @@ import 'package:healthub_frontend/WeightScreen.dart';
 import '../MealScreen.dart';
 
 class DrawerList extends StatelessWidget {
+
+  final String id;
+
+  DrawerList({@required this.id});
+
   @override
   Widget build(BuildContext context) {
+    print(id);
     String _password;
     return Drawer(
       child: ListView(
@@ -28,7 +34,7 @@ class DrawerList extends StatelessWidget {
             onTap: () {
               Navigator.of(context).pop();
               Navigator.of(context).push(MaterialPageRoute(
-                  builder: (BuildContext context) => ProfileScreen()));
+                  builder: (BuildContext context) => ProfileScreen(id: id)));
             },
           ),
           ListTile(
@@ -53,8 +59,9 @@ class DrawerList extends StatelessWidget {
             title: Text("Meal"),
             onTap: () {
               Navigator.of(context).pop();
-              Navigator.of(context).push(MaterialPageRoute(
-                  builder: (BuildContext context) => MealScreen()));
+              Navigator.push(context, MaterialPageRoute(
+                  builder: (context) => MealScreen(id: id)
+              ),);
             },
           ),
           ListTile(

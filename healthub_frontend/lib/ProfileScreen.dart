@@ -38,6 +38,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   TextEditingController ageController = TextEditingController();
 
   _getProfile() async {
+    print(widget.id);
 
     _apiResponse = await profileService.getProfile(widget.id);
     
@@ -146,7 +147,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           )
         ],
       ),
-      drawer: DrawerList(),
+      drawer: DrawerList(id: widget.id),
       body: Stack(
         children: <Widget>[
           Padding(

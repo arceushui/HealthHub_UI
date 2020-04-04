@@ -1,26 +1,78 @@
-
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get_it/get_it.dart';
+import 'package:healthub_frontend/Model/Meal.dart';
+import 'package:healthub_frontend/Service/meal_service.dart';
 import 'package:intl/intl.dart';
 
+import 'Model/GenerateMeal.dart';
+import 'Model/api_response.dart';
 import 'NewMeal.dart';
 import 'Widget/DrawerList.dart';
 import 'Widget/ItemList.dart';
 
 class MealScreen extends StatefulWidget {
+  final String id;
+
+  MealScreen({@required this.id});
   @override
   _MealScreenState createState() => _MealScreenState();
 }
 
 List<Color> colors = [Colors.blue[800], Color(0xFFffe5b4), Colors.red];
-List<DateTime> date = [DateTime(2020), DateTime(2020,4,2), DateTime(2020,4,3), DateTime(2020,4,4)];
+List<DateTime> mealTime = [DateTime(2010, 9, 23)];
+var formatter = new DateFormat('yyyy-MM-dd');
 
 class _MealScreenState extends State<MealScreen> {
 
+  MealService get mealService => GetIt.I<MealService>();
+
+  APIResponse<GenerateMeal> _apiResponse;
+
+  List<Meal> list;
+
+  List<DateTime> mealTime = new List<DateTime>();
+
+
+
+  _getMeal() async {
+
+    print(widget.id);
+    _apiResponse = await mealService.getMeal(widget.id);
+
+    list = _apiResponse.data.meals.toList();
+    print(list);
+    for(var i = 0; i < list.length; i++) {
+      if (i != 0) {
+        if (formatter.format(list[i].mealTime) != formatter.format(list[i - 1].mealTime)) {
+          mealTime.add(list[i].mealTime);
+        }
+      }
+      else
+        mealTime.add(list[i].mealTime);
+    }
+
+
+    print(mealTime);
+  }
+
+  @override
+  void initState() {
+      _getMeal();
+    super.initState();
+  }
+
   bool choose = false;
   int choose_index = 0;
+
+  String breakfast = "Please add the meal";
+  String lunch = "Please add the meal";
+  String dinner = "Please add the meal";
+
+  double breakfastCalories = 0;
+  double lunchCalories = 0;
+  double dinnerCalories = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +84,7 @@ class _MealScreenState extends State<MealScreen> {
       appBar: AppBar(
         title: Text("Meal"),
       ),
-      drawer: DrawerList(),
+      drawer: DrawerList(id: widget.id),
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -65,13 +117,39 @@ class _MealScreenState extends State<MealScreen> {
                                 color: Colors.transparent,
                                   child: InkWell(
                                     child: Text(
-                                      new DateFormat.yMMMd().format(date[index]).toString(),
+                                      new DateFormat.yMMMd().format(mealTime[index]).toString(),
                                       style: TextStyle(
                                           color: choose == true && (index == choose_index)? Colors.blue : Colors.white,
                                           fontSize: 24.0,
                                           fontWeight: FontWeight.w600),
                                     ),
                                     onTap: (){
+                                      breakfast = "Please add the meal";
+                                      lunch = "Please add the meal";
+                                      dinner = "Please add the meal";
+
+                                      breakfastCalories = 0;
+                                      lunchCalories = 0;
+                                      dinnerCalories = 0;
+                                      for(var i = 0; i < list.length; i++) {
+                                        if (formatter.format(list[i].mealTime) == formatter.format(mealTime[index])) {
+
+                                          if(list[i].mealType == "breakfast"){
+                                            breakfast = list[i].mealName;
+                                            breakfastCalories = list[i].calories;
+                                          }
+
+                                          else if(list[i].mealType == "lunch"){
+                                            lunch = list[i].mealName;
+                                            lunchCalories = list[i].calories;
+                                          }
+
+                                          else{
+                                            dinner = list[i].mealName;
+                                            dinnerCalories = list[i].calories;
+                                          }
+                                        }
+                                      }
                                       setState(() {
                                         choose_index = index;
 
@@ -90,7 +168,7 @@ class _MealScreenState extends State<MealScreen> {
                           width: 15.0,
                         );
                       },
-                      itemCount: date.length,
+                      itemCount: mealTime.length,
                     ),
                   ),
                 ],
@@ -111,18 +189,18 @@ class _MealScreenState extends State<MealScreen> {
                     itemExtent: 106.0,
                     children: <CustomListItem>[
                       CustomListItem(
-                        mealName: "rice",
-                        calories: 1213,
+                        mealName: breakfast,
+                        calories: breakfastCalories,
                         title: "Breakfast",
                       ),
                       CustomListItem(
-                        mealName: "rice",
-                        calories: 1213,
+                        mealName: lunch,
+                        calories: lunchCalories,
                         title: "Lunch",
                       ),
                       CustomListItem(
-                        mealName: "rice",
-                        calories: 1213,
+                        mealName: dinner,
+                        calories: dinnerCalories,
                         title: "Dinner",
                       ),
                     ],
@@ -135,9 +213,10 @@ class _MealScreenState extends State<MealScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: (){
-          Navigator.push(context, MaterialPageRoute(
-              builder: (context) => NewMeal()
-          ),);
+          Navigator.of(context).push(MaterialPageRoute(
+              builder: (BuildContext context) => NewMeal(id: widget.id,))).then((context){
+                _getMeal();
+          });
         },
         child: Icon(
           Icons.add,
