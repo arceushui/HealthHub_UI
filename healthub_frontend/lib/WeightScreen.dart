@@ -23,21 +23,19 @@ Widget _buildList(weights) => ListView.builder(
     });
 
 class WeightScreen extends StatefulWidget {
-  final String id;
-  WeightScreen({@required this.id});
   @override
   _WeightScreenState createState() => _WeightScreenState();
 }
 
 class _WeightScreenState extends State<WeightScreen> {
   ProfileService get profileService => GetIt.I<ProfileService>();
-
+  String id = "5e8045a1a48f421f4f9ff6c4";
   APIResponse<Profile> _apiResponse;
   List<Weight> weights;
 
   Future<List<Weight>> _getWeights() async {
-    _apiResponse = await profileService.getProfile(widget.id);
-
+    _apiResponse = await profileService.getProfile(id);
+    print(_apiResponse.data);
     return _apiResponse.data.weights;
   }
 
