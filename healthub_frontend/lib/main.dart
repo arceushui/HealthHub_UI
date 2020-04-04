@@ -215,53 +215,54 @@ class _MyAppState extends State<MyApp> {
                             child: Material(
                                 color: Colors.transparent,
                                 child: InkWell(
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              ProfileScreen(id: "")),
-                                    );
+                                  onTap:
+                                      // () {
+                                      //   Navigator.push(
+                                      //     context,
+                                      //     MaterialPageRoute(
+                                      //         builder: (context) =>
+                                      //             ProfileScreen(id: "")),
+                                      //   );
 
-                                    //     () async {
-                                    //   final user = Login(
-                                    //       username: usernameController.text,
-                                    //       password: passwordController.text);
+                                      () async {
+                                    final user = Login(
+                                        username: usernameController.text,
+                                        password: passwordController.text);
 
-                                    //   final result =
-                                    //       await loginService.login(user);
-                                    //   final id = await loginService.sendId(user);
+                                    final result =
+                                        await loginService.login(user);
+                                    final id = await loginService.sendId(user);
 
-                                    //   print(usernameController.text);
-                                    //   print(passwordController.text);
-                                    //   print(result);
-                                    //   print(id.data);
-                                    //   if (result.error) {
-                                    //     showDialog(
-                                    //         context: context,
-                                    //         barrierDismissible: true,
-                                    //         builder: (context) {
-                                    //           return AlertDialog(
-                                    //             title: Text('Error 422'),
-                                    //             content: Text('Invalid'),
-                                    //             actions: <Widget>[
-                                    //               FlatButton(
-                                    //                 child: Text('OK'),
-                                    //                 onPressed: () {
-                                    //                   Navigator.of(context).pop();
-                                    //                 },
-                                    //               ),
-                                    //             ],
-                                    //           );
-                                    //         });
-                                    //   } else {
-                                    //     Navigator.push(
-                                    //       context,
-                                    //       MaterialPageRoute(
-                                    //           builder: (context) =>
-                                    //               ProfileScreen(id: id.data)),
-                                    //     );
-                                    //   }
+                                    print(usernameController.text);
+                                    print(passwordController.text);
+                                    print(result);
+                                    print(id.data);
+                                    if (result.error) {
+                                      showDialog(
+                                          context: context,
+                                          barrierDismissible: true,
+                                          builder: (context) {
+                                            return AlertDialog(
+                                              title: Text('Error 422'),
+                                              content: Text('Invalid'),
+                                              actions: <Widget>[
+                                                FlatButton(
+                                                  child: Text('OK'),
+                                                  onPressed: () {
+                                                    Navigator.of(context).pop();
+                                                  },
+                                                ),
+                                              ],
+                                            );
+                                          });
+                                    } else {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                ProfileScreen(id: id.data)),
+                                      );
+                                    }
                                   },
                                   child: Center(
                                     child: Text(

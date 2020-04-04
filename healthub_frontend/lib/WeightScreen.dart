@@ -35,11 +35,29 @@ class _WeightScreenState extends State<WeightScreen> {
   APIResponse<Profile> _apiResponse;
   List<Weight> weights;
 
-  _getWeights() async {
+  Future<List<Weight>> _getWeights() async {
     _apiResponse = await profileService.getProfile(widget.id);
 
-    weights = _apiResponse.data.weights;
+    return _apiResponse.data.weights;
   }
+
+  Widget _futureBuilder(BuildContext context) => FutureBuilder<List<Weight>>(
+        future: _getWeights(), // a Future<String> or null
+        builder: (context, AsyncSnapshot<List<Weight>> snapshot) {
+          switch (snapshot.connectionState) {
+            case ConnectionState.none:
+              return new Text('Press button to start');
+            case ConnectionState.waiting:
+              return CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.blue));
+            default:
+              if (snapshot.hasError)
+                return new Text('Error: ${snapshot.error}');
+              else
+                return _buildList(snapshot.data);
+          }
+        },
+      );
 
   // void saveProfile(){
   //   List<Weight> list = weights;
@@ -62,25 +80,26 @@ class _WeightScreenState extends State<WeightScreen> {
   var _formKey = GlobalKey<FormState>();
 
   TextEditingController weightController = TextEditingController();
+  // Future<List<Weight>> _weights = Future<List<Weight>>.delayed(
+  //   Duration(seconds: 2),
+  //   () => ,
+  // );
 
   @override
   Widget build(BuildContext context) {
     ScreenUtil.instance = ScreenUtil.getInstance()..init(context);
     ScreenUtil.instance = ScreenUtil(allowFontScaling: true);
-    List<Weight> weights = this.weights;
-    // [
-    //   new Weight(weight: 50, timestamp: new DateTime.now()),
-    //   new Weight(weight: 60, timestamp: new DateTime.now())
-    // ];
+    weights = [
+      new Weight(weight: 50, timestamp: new DateTime.now()),
+      new Weight(weight: 60, timestamp: new DateTime.now())
+    ];
     return new Scaffold(
       appBar: AppBar(
         title: Text("Weight"),
       ),
       drawer: DrawerList(),
       body: Container(
-        child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 20),
-            child: _buildList(weights)),
+        child: _futureBuilder(context),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
