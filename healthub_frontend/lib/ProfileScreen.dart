@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get_it/get_it.dart';
+import 'package:healthub_frontend/Model/GenerateProfile.dart';
 import 'package:healthub_frontend/Model/Profile.dart';
+import 'package:healthub_frontend/Model/Weight.dart';
 import 'package:healthub_frontend/Widget/SaveAlertDialog.dart';
 import 'package:healthub_frontend/Widget/DrawerList.dart';
 
@@ -24,28 +26,49 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   APIResponse<Profile> _apiResponse;
 
+  int age;
+  int height;
+  String gender;
+  List<Weight> weights;
+  int _selectedGender;
 
-  @override
-  void initState() {
-    _getProfile();
-    super.initState();
-  }
-
-
-
-  _getProfile() async {
-
-    _apiResponse= await profileService.getProfile(widget.id);
-
-  }
-
-  int _selectedGender = 0;
-  List<DropdownMenuItem<int>> genderList = [];
 
   TextEditingController weightController = TextEditingController();
   TextEditingController heightController = TextEditingController();
   TextEditingController ageController = TextEditingController();
-  TextEditingController genderController = TextEditingController();
+
+  _getProfile() async {
+
+    _apiResponse = await profileService.getProfile(widget.id);
+    
+    weights = _apiResponse.data.weights;
+    height = _apiResponse.data.height;
+    gender = _apiResponse.data.gender;
+    age  =_apiResponse.data.age;
+
+    weightController = new TextEditingController(text: weights[0].weight.toString());
+    heightController = new TextEditingController(text: height.toString());
+    ageController = new TextEditingController(text: age.toString());
+    if(gender == 'male')
+      _selectedGender = 0;
+    else
+      _selectedGender = 1;
+  }
+
+
+
+  List<DropdownMenuItem<int>> genderList = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _getProfile();
+  }
+
+  double weightChanged;
+  int ageChanged;
+  String genderChanged;
+  int heightChanged;
 
   void loadGenderList() {
     genderList = [];
@@ -61,6 +84,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Widget getFormWidget() {
 
+
+
     return new DropdownButton(
       hint: new Text('Select Gender'),
       items: genderList,
@@ -68,6 +93,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
       onChanged: (value) {
       setState(() {
         _selectedGender = value;
+        if(_selectedGender == 0)
+          gender = 'male';
+        else
+          gender = 'female';
       });
       },
       isExpanded: true,
@@ -75,12 +104,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   void saveProfile(){
-
+    List<Weight> list = [];
+    Weight updatedweight = Weight(timestamp: DateTime.now(), weight: double.parse(weightController.text));
+    print(updatedweight);
+    list.add(updatedweight);
+    print(list);
+    Profile save = Profile(weights: list, age: int.parse(ageController.text), height: int.parse(heightController.text), gender: gender);
+    print(gender);
+    profileService.editProfile(GenerateProfile(profile: save), widget.id);
+    Navigator.of(context).pop();
   }
 
   void cancel(){
     Navigator.of(context).pop();
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -88,6 +126,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     ScreenUtil.instance = ScreenUtil(allowFontScaling: true);
 
     loadGenderList();
+
 
     return Scaffold(
       appBar: AppBar(
@@ -234,7 +273,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                 borderSide: BorderSide(color: Colors.black)
                                             ),
                                           ),
-                                          keyboardType: TextInputType.number,
+                                          keyboardType: TextInputType.numberWithOptions(decimal: true),
 
                                         ),
                                       ],

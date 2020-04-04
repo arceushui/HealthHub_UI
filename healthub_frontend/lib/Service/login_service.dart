@@ -13,19 +13,22 @@ class LoginService {
         .post(API + '/login',
             headers: headers, body: json.encode(item.toJson()))
         .then((data) {
-      if (data.statusCode == 200 && (data.body == "error")) {
+      print(json.encode(item.toJson()));
+      print(data.statusCode);
+      print(data.body);
+      if (data.statusCode == 200 && data.body == "error") {
         return APIResponse<bool>(error: true, errorMessage: 'An error occured');
       } else {
-        return APIResponse<String>(data: data.body);
+        return APIResponse<bool>(error: false);
       }
     }).catchError((_) =>
             APIResponse<bool>(error: true, errorMessage: 'An error occured'));
   }
 
   Future<APIResponse<String>> sendId(Login item) {
-    print("sent ID");
     return http
-        .post(API + '/login', body: json.encode(item.toJson()))
+        .post(API + '/login',
+            headers: headers, body: json.encode(item.toJson()))
         .then((data) {
       return APIResponse<String>(data: data.body);
     });
