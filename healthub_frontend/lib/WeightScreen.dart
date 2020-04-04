@@ -14,12 +14,10 @@ class _WeightScreenState extends State<WeightScreen> {
     ScreenUtil.instance = ScreenUtil.getInstance()..init(context);
     ScreenUtil.instance = ScreenUtil(allowFontScaling: true);
     return new Scaffold(
-      appBar: AppBar(
+        appBar: AppBar(
           title: Text("Weight"),
-      ),
-      drawer: DrawerList(),
-      body: Container();
-
-    );
+        ),
+        drawer: DrawerList(),
+        body: Container());
   }
 }
