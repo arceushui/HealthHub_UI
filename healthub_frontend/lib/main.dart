@@ -196,98 +196,12 @@ class _MyAppState extends State<MyApp> {
                         SizedBox(
                           width: 12.0,
                         ),
-                        InkWell(
-                          child: Container(
-                            width: ScreenUtil.getInstance().setWidth(330),
-                            height: ScreenUtil.getInstance().setHeight(100),
-                            decoration: BoxDecoration(
-                                gradient: LinearGradient(colors: [
-                                  Color(0xFF17ead9),
-                                  Color(0xFF6078ea)
-                                ]),
-                                borderRadius: BorderRadius.circular(6.0),
-                                boxShadow: [
-                                  BoxShadow(
-                                      color: Color(0xFF6078ea).withOpacity(0.3),
-                                      offset: Offset(0.0, 0.0),
-                                      blurRadius: 8.0)
-                                ]),
-                            child: Material(
-                                color: Colors.transparent,
-                                child: InkWell(
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              ProfileScreen(id: "")),
-                                    );
-
-                                    //   () async {
-                                    // final user = Login(
-                                    //     username: usernameController.text,
-                                    //     password: passwordController.text);
-
-                                    // final result =
-                                    //     await loginService.login(user);
-                                    // final id = await loginService.sendId(user);
-
-                                    // print(usernameController.text);
-                                    // print(passwordController.text);
-                                    // print(result);
-                                    // print(id.data);
-                                    // if (result.error) {
-                                    //   showDialog(
-                                    //       context: context,
-                                    //       barrierDismissible: true,
-                                    //       builder: (context) {
-                                    //         return AlertDialog(
-                                    //           title: Text('Error 422'),
-                                    //           content: Text('Invalid'),
-                                    //           actions: <Widget>[
-                                    //             FlatButton(
-                                    //               child: Text('OK'),
-                                    //               onPressed: () {
-                                    //                 Navigator.of(context).pop();
-                                    //               },
-                                    //             ),
-                                    //           ],
-                                    //         );
-                                    //       });
-                                    // } else {
-                                    //   Navigator.push(
-                                    //     context,
-                                    //     MaterialPageRoute(
-                                    //         builder: (context) =>
-                                    //             ProfileScreen(id: id.data)),
-                                    //   );
-                                    // }
-                                  },
-                                  child: Center(
-                                    child: Text(
-                                      "LOGIN",
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 18,
-                                        fontFamily: "Open Sans",
-                                      ),
-                                    ),
-                                  ),
-                                )),
-                          ),
-                        )
-                      ],
-                    ),
-                    SizedBox(
-                      height: ScreenUtil.getInstance().setHeight(40),
-                    ),
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        Text(
-                          "Don't have an account?",
-                          style: TextStyle(
-                              fontFamily: "Open Sans", color: Colors.white),
+                        GestureDetector(
+                          onTap: _radio,
+                          child: radioButton(_isSelected),
+                        ),
+                        SizedBox(
+                          width: 8.0,
                         ),
                         Text("Remember me",
                             style: TextStyle(
@@ -296,6 +210,74 @@ class _MyAppState extends State<MyApp> {
                                 color: Colors.white))
                       ],
                     ),
+                    InkWell(
+                      child: Container(
+                        width: ScreenUtil.getInstance().setWidth(330),
+                        height: ScreenUtil.getInstance().setHeight(100),
+                        decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                                colors: [Color(0xFF17ead9), Color(0xFF6078ea)]),
+                            borderRadius: BorderRadius.circular(6.0),
+                            boxShadow: [
+                              BoxShadow(
+                                  color: Color(0xFF6078ea).withOpacity(0.3),
+                                  offset: Offset(0.0, 0.0),
+                                  blurRadius: 8.0)
+                            ]),
+                        child: Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              onTap: () async {
+                                final user = Login(
+                                    username: usernameController.text,
+                                    password: passwordController.text);
+                                final result = await loginService.login(user);
+                                final id = await loginService.sendId(user);
+
+                                print(usernameController.text);
+                                print(passwordController.text);
+                                print(result);
+                                print(id.data);
+                                if (result.error) {
+                                  showDialog(
+                                      context: context,
+                                      barrierDismissible: true,
+                                      builder: (context) {
+                                        return AlertDialog(
+                                          title: Text('Error 422'),
+                                          content: Text('Invalid'),
+                                          actions: <Widget>[
+                                            FlatButton(
+                                              child: Text('OK'),
+                                              onPressed: () {
+                                                Navigator.of(context).pop();
+                                              },
+                                            ),
+                                          ],
+                                        );
+                                      });
+                                } else {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            ProfileScreen(id: id.data)),
+                                  );
+                                }
+                              },
+                              child: Center(
+                                child: Text(
+                                  "LOGIN",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 18,
+                                    fontFamily: "Open Sans",
+                                  ),
+                                ),
+                              ),
+                            )),
+                      ),
+                    )
                   ],
                 ),
                 SizedBox(
