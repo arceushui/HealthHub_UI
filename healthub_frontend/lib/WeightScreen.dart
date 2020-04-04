@@ -1,83 +1,77 @@
 import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:healthub_frontend/Widget/DrawerList.dart';
+import 'package:healthub_frontend/Model/Weight.dart';
 
-Widget _buildList() => ListView(
-      children: [
-        _tile('CineArts at the Empire', '85 W Portal Ave', Icons.theaters),
-        _tile('The Castro Theater', '429 Castro St', Icons.theaters),
-        _tile('Alamo Drafthouse Cinema', '2550 Mission St', Icons.theaters),
-        _tile('Roxie Theater', '3117 16th St', Icons.theaters),
-        _tile('United Artists Stonestown Twin', '501 Buckingham Way',
-            Icons.theaters),
-        _tile('AMC Metreon 16', '135 4th St #3000', Icons.theaters),
-        Divider(),
-        _tile('Kescaped_code#39;s Kitchen', '757 Monterey Blvd',
-            Icons.restaurant),
-        _tile('Emmyescaped_code#39;s Restaurant', '1923 Ocean Ave',
-            Icons.restaurant),
-        _tile('Chaiya Thai Restaurant', '272 Claremont Blvd', Icons.restaurant),
-        _tile('La Ciccia', '291 30th St', Icons.restaurant),
-      ],
-    );
+import 'Model/api_response.dart';
+import 'Service/profile_service.dart';
+import 'package:healthub_frontend/Model/Profile.dart';
 
-ListTile _tile(String title, String subtitle, IconData icon) => ListTile(
-      title: Text(title,
-          style: TextStyle(
-            fontWeight: FontWeight.w500,
-            fontSize: 20,
-          )),
-      subtitle: Text(subtitle),
-      leading: Icon(
-        icon,
-        color: Colors.blue[500],
-      ),
-    );
+Widget _buildList(weights) => ListView.builder(
+    itemCount: weights.length,
+    itemBuilder: (BuildContext context, int position) {
+      var weight = weights[position];
+      return ListTile(
+          title: Text(weight.weight.toString() + " KG"),
+          subtitle: Text(weight.timestamp.day.toString() +
+              "/" +
+              weight.timestamp.month.toString() +
+              "/" +
+              weight.timestamp.year.toString()));
+    });
 
 class WeightScreen extends StatefulWidget {
+  final String id;
+  WeightScreen({@required this.id});
   @override
   _WeightScreenState createState() => _WeightScreenState();
-
-  Widget _buildList() => ListView(
-        children: [
-          _tile('CineArts at the Empire', '85 W Portal Ave', Icons.theaters),
-          _tile('The Castro Theater', '429 Castro St', Icons.theaters),
-          _tile('Alamo Drafthouse Cinema', '2550 Mission St', Icons.theaters),
-          _tile('Roxie Theater', '3117 16th St', Icons.theaters),
-          _tile('United Artists Stonestown Twin', '501 Buckingham Way',
-              Icons.theaters),
-          _tile('AMC Metreon 16', '135 4th St #3000', Icons.theaters),
-          Divider(),
-          _tile('Kescaped_code#39;s Kitchen', '757 Monterey Blvd',
-              Icons.restaurant),
-          _tile('Emmyescaped_code#39;s Restaurant', '1923 Ocean Ave',
-              Icons.restaurant),
-          _tile(
-              'Chaiya Thai Restaurant', '272 Claremont Blvd', Icons.restaurant),
-          _tile('La Ciccia', '291 30th St', Icons.restaurant),
-        ],
-      );
-
-  ListTile _tile(String title, String subtitle, IconData icon) => ListTile(
-        title: Text(title,
-            style: TextStyle(
-              fontWeight: FontWeight.w500,
-              fontSize: 20,
-            )),
-        subtitle: Text(subtitle),
-        leading: Icon(
-          icon,
-          color: Colors.blue[500],
-        ),
-      );
 }
 
 class _WeightScreenState extends State<WeightScreen> {
+  ProfileService get profileService => GetIt.I<ProfileService>();
+
+  APIResponse<Profile> _apiResponse;
+  List<Weight> weights;
+
+  _getWeights() async {
+    _apiResponse = await profileService.getProfile(widget.id);
+
+    weights = _apiResponse.data.weights;
+  }
+
+  // void saveProfile(){
+  //   List<Weight> list = weights;
+  //   Weight updatedweight = Weight(timestamp: DateTime.now(), weight: double.parse(weightController.text));
+  //   print(updatedweight);
+  //   list.add(updatedweight);
+  //   print(list);
+  //   Profile save = Profile(weights: list);
+  //   print(gender);
+  //   profileService.editProfile(GenerateProfile(profile: save), widget.id);
+  //   Navigator.of(context).pop();
+  // }
+
+  @override
+  void initState() {
+    super.initState();
+    _getWeights();
+  }
+
+  var _formKey = GlobalKey<FormState>();
+
+  TextEditingController weightController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     ScreenUtil.instance = ScreenUtil.getInstance()..init(context);
     ScreenUtil.instance = ScreenUtil(allowFontScaling: true);
+    List<Weight> weights = this.weights;
+    // [
+    //   new Weight(weight: 50, timestamp: new DateTime.now()),
+    //   new Weight(weight: 60, timestamp: new DateTime.now())
+    // ];
     return new Scaffold(
       appBar: AppBar(
         title: Text("Weight"),
@@ -86,10 +80,42 @@ class _WeightScreenState extends State<WeightScreen> {
       body: Container(
         child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 20),
-            child: _buildList()),
+            child: _buildList(weights)),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => {},
+        onPressed: () {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                  content: Form(
+                      key: _formKey,
+                      child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: <Widget>[
+                            Padding(
+                              padding: EdgeInsets.all(8.0),
+                              child: TextFormField(
+                                decoration: const InputDecoration(
+                                    hintText: 'e.g. 50',
+                                    labelText: 'Weight',
+                                    suffixText: "KG",
+                                    labelStyle: TextStyle(fontSize: 20)),
+                              ),
+                            ),
+                            Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: RaisedButton(
+                                    child: Text("Submit"),
+                                    onPressed: () {
+                                      if (_formKey.currentState.validate()) {
+                                        _formKey.currentState.save();
+                                      }
+                                    })),
+                          ])));
+            },
+          );
+        },
         tooltip: 'Increment Counter',
         child: const Icon(Icons.add),
       ),
