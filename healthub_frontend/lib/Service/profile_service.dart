@@ -6,19 +6,14 @@ import 'package:healthub_frontend/Model/api_response.dart';
 import 'package:http/http.dart' as http;
 
 class ProfileService {
-  static const API = 'http://a750f086.ngrok.io';
+  static const API = 'http://192.168.1.233:8080';
   static const headers = {'Content-Type': 'application/json'};
 
   Future<APIResponse<Profile>> getProfile(String id) {
-    print("HERE");
     return http.get(API + '/healthprofile?id=' + id, headers: headers).then(
         (data) {
-      print("HERE?" + id);
-      print(data.body);
-      print(data.statusCode);
       if (data.statusCode == 200) {
         final jsonData = json.decode(data.body);
-        print(jsonData);
         return APIResponse<Profile>(data: Profile.fromJson(jsonData));
       }
       return APIResponse<Profile>(
@@ -32,7 +27,6 @@ class ProfileService {
         .post(API + '/healthprofile?id=' + id,
             headers: headers, body: json.encode(item.toJson()))
         .then((data) {
-      print(data.body);
       return APIResponse<String>(data: data.body);
     });
   }

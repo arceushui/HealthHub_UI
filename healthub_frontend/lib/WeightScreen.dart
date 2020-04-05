@@ -1,26 +1,14 @@
-import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:healthub_frontend/Widget/DrawerList.dart';
 import 'package:healthub_frontend/Model/Weight.dart';
+import 'package:flutter/services.dart';
 
 import 'Model/api_response.dart';
 import 'Service/profile_service.dart';
+import 'package:healthub_frontend/Widget/WeightLineChart.dart';
 import 'package:healthub_frontend/Model/Profile.dart';
-
-Widget _buildList(weights) => ListView.builder(
-    itemCount: weights.length,
-    itemBuilder: (BuildContext context, int position) {
-      var weight = weights[position];
-      return ListTile(
-          title: Text(weight.weight.toString() + " KG"),
-          subtitle: Text(weight.timestamp.day.toString() +
-              "/" +
-              weight.timestamp.month.toString() +
-              "/" +
-              weight.timestamp.year.toString()));
-    });
 
 class WeightScreen extends StatefulWidget {
   @override
@@ -34,9 +22,7 @@ class _WeightScreenState extends State<WeightScreen> {
   List<Weight> weights;
 
   Future<List<Weight>> _getWeights() async {
-    print("id is " + id);
     _apiResponse = await profileService.getProfile(id);
-    print(_apiResponse.data);
     return _apiResponse.data.weights;
   }
 
@@ -54,10 +40,30 @@ class _WeightScreenState extends State<WeightScreen> {
               if (snapshot.hasError)
                 return new Text('Error: ${snapshot.error}');
               else
-                return _buildList(snapshot.data);
+                return _buildChartAndList(snapshot.data);
           }
         },
       );
+
+  Widget _buildChartAndList(weights) => Column(
+        children: <Widget>[
+          new Expanded(child: WeightLineChart.withWeights(weights)),
+          new Expanded(child: _buildList(weights)),
+        ],
+      );
+
+  Widget _buildList(weights) => ListView.builder(
+      itemCount: weights.length,
+      itemBuilder: (BuildContext context, int position) {
+        var weight = weights[position];
+        return ListTile(
+            title: Text(weight.weight.toString() + " KG"),
+            subtitle: Text(weight.timestamp.day.toString() +
+                "/" +
+                weight.timestamp.month.toString() +
+                "/" +
+                weight.timestamp.year.toString()));
+      });
 
   // void saveProfile(){
   //   List<Weight> list = weights;
@@ -80,27 +86,17 @@ class _WeightScreenState extends State<WeightScreen> {
   var _formKey = GlobalKey<FormState>();
 
   TextEditingController weightController = TextEditingController();
-  // Future<List<Weight>> _weights = Future<List<Weight>>.delayed(
-  //   Duration(seconds: 2),
-  //   () => ,
-  // );
 
   @override
   Widget build(BuildContext context) {
     ScreenUtil.instance = ScreenUtil.getInstance()..init(context);
     ScreenUtil.instance = ScreenUtil(allowFontScaling: true);
-    weights = [
-      new Weight(weight: 50, timestamp: new DateTime.now()),
-      new Weight(weight: 60, timestamp: new DateTime.now())
-    ];
     return new Scaffold(
       appBar: AppBar(
         title: Text("Weight"),
       ),
       drawer: DrawerList(),
-      body: Container(
-        child: _futureBuilder(context),
-      ),
+      body: Container(child: _futureBuilder(context)),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           showDialog(
@@ -117,9 +113,13 @@ class _WeightScreenState extends State<WeightScreen> {
                               child: TextFormField(
                                 decoration: const InputDecoration(
                                     hintText: 'e.g. 50',
-                                    labelText: 'Weight',
+                                    labelText: 'Add Today\'s Weight',
                                     suffixText: "KG",
                                     labelStyle: TextStyle(fontSize: 20)),
+                                inputFormatters: <TextInputFormatter>[
+                                  WhitelistingTextInputFormatter.digitsOnly
+                                ],
+                                keyboardType: TextInputType.number,
                               ),
                             ),
                             Padding(

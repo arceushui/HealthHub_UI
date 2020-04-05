@@ -5,7 +5,7 @@ import 'package:healthub_frontend/Model/login.dart';
 import 'package:http/http.dart' as http;
 
 class LoginService {
-  static const API = 'http://a750f086.ngrok.io';
+  static const API = 'http://192.168.1.233:8080';
 
   static const headers = {'Content-Type': 'application/json'};
 
