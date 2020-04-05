@@ -8,6 +8,7 @@ import 'package:healthub_frontend/SleepScreen.dart';
 import '../MealScreen.dart';
 
 class DrawerList extends StatelessWidget {
+
   @override
   Widget build(BuildContext context) {
     String _password;
@@ -40,7 +41,7 @@ class DrawerList extends StatelessWidget {
             onTap: () {
               Navigator.of(context).pop();
               Navigator.of(context).push(MaterialPageRoute(
-                  builder: (BuildContext context) => WeightScreen()));
+                  builder: (BuildContext context) => WeightScreen(id:)));
             },
           ),
           ListTile(

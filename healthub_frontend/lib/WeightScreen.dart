@@ -9,26 +9,34 @@ import 'Model/api_response.dart';
 import 'Service/profile_service.dart';
 import 'package:healthub_frontend/Widget/WeightLineChart.dart';
 import 'package:healthub_frontend/Model/Profile.dart';
+import 'package:healthub_frontend/Model/GenerateProfile.dart';
 
 class WeightScreen extends StatefulWidget {
+  final String id;
+  WeightScreen({@required this.id});
   @override
   _WeightScreenState createState() => _WeightScreenState();
 }
 
 class _WeightScreenState extends State<WeightScreen> {
   ProfileService get profileService => GetIt.I<ProfileService>();
-  String id = "5e8045a1a48f421f4f9ff6c4";
+  // String id = "5e8045a1a48f421f4f9ff6c4";
   APIResponse<Profile> _apiResponse;
-  List<Weight> weights;
+  Profile profile;
 
-  Future<List<Weight>> _getWeights() async {
-    _apiResponse = await profileService.getProfile(id);
-    return _apiResponse.data.weights;
+  Future<Profile> _getProfile() async {
+    print(widget.id.toString());
+    print("here ID ");
+    _apiResponse = await profileService.getProfile(widget.id);
+    profile = _apiResponse.data;
+    print("profile is " + profile.toJson().toString());
+
+    return profile;
   }
 
-  Widget _futureBuilder(BuildContext context) => FutureBuilder<List<Weight>>(
-        future: _getWeights(), // a Future<String> or null
-        builder: (context, AsyncSnapshot<List<Weight>> snapshot) {
+  Widget _futureBuilder(BuildContext context) => FutureBuilder<Profile>(
+        future: _getProfile(), // a Future<String> or null
+        builder: (context, AsyncSnapshot<Profile> snapshot) {
           switch (snapshot.connectionState) {
             case ConnectionState.none:
               return new Text('Press button to start');
@@ -40,7 +48,8 @@ class _WeightScreenState extends State<WeightScreen> {
               if (snapshot.hasError)
                 return new Text('Error: ${snapshot.error}');
               else
-                return _buildChartAndList(snapshot.data);
+                print("snapshot is " + snapshot.data.toString());
+              return _buildChartAndList(snapshot.data.weights);
           }
         },
       );
@@ -65,22 +74,18 @@ class _WeightScreenState extends State<WeightScreen> {
                 weight.timestamp.year.toString()));
       });
 
-  // void saveProfile(){
-  //   List<Weight> list = weights;
-  //   Weight updatedweight = Weight(timestamp: DateTime.now(), weight: double.parse(weightController.text));
-  //   print(updatedweight);
-  //   list.add(updatedweight);
-  //   print(list);
-  //   Profile save = Profile(weights: list);
-  //   print(gender);
-  //   profileService.editProfile(GenerateProfile(profile: save), widget.id);
-  //   Navigator.of(context).pop();
-  // }
+  void saveProfile() {
+    Weight updatedweight = Weight(
+        timestamp: DateTime.now(), weight: double.parse(weightController.text));
+    profile.weights.add(updatedweight);
+    Profile save = profile;
+    profileService.editProfile(GenerateProfile(profile: save), widget.id);
+    Navigator.of(context).pop();
+  }
 
   @override
   void initState() {
     super.initState();
-    _getWeights();
   }
 
   var _formKey = GlobalKey<FormState>();
@@ -111,6 +116,7 @@ class _WeightScreenState extends State<WeightScreen> {
                             Padding(
                               padding: EdgeInsets.all(8.0),
                               child: TextFormField(
+                                controller: weightController,
                                 decoration: const InputDecoration(
                                     hintText: 'e.g. 50',
                                     labelText: 'Add Today\'s Weight',
@@ -129,6 +135,7 @@ class _WeightScreenState extends State<WeightScreen> {
                                     onPressed: () {
                                       if (_formKey.currentState.validate()) {
                                         _formKey.currentState.save();
+                                        saveProfile();
                                       }
                                     })),
                           ])));
