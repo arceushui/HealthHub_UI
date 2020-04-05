@@ -2,14 +2,19 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/material.dart';
 import 'package:healthub_frontend/ProfileScreen.dart';
 import 'package:healthub_frontend/WeightScreen.dart';
-import 'package:healthub_frontend/ExerciseScreen.dart';
+import 'package:healthub_frontend/ActivitiesScreen.dart';
 import 'package:healthub_frontend/SleepScreen.dart';
 
 import '../MealScreen.dart';
 
 class DrawerList extends StatelessWidget {
+  final String id;
+
+  DrawerList({@required this.id});
+
   @override
   Widget build(BuildContext context) {
+    print(id);
     String _password;
     return Drawer(
       child: ListView(
@@ -31,7 +36,7 @@ class DrawerList extends StatelessWidget {
             onTap: () {
               Navigator.of(context).pop();
               Navigator.of(context).push(MaterialPageRoute(
-                  builder: (BuildContext context) => ProfileScreen()));
+                  builder: (BuildContext context) => ProfileScreen(id: id)));
             },
           ),
           ListTile(
@@ -40,7 +45,7 @@ class DrawerList extends StatelessWidget {
             onTap: () {
               Navigator.of(context).pop();
               Navigator.of(context).push(MaterialPageRoute(
-                  builder: (BuildContext context) => WeightScreen()));
+                  builder: (BuildContext context) => WeightScreen(id: id)));
             },
           ),
           ListTile(
@@ -49,7 +54,7 @@ class DrawerList extends StatelessWidget {
             onTap: () {
               Navigator.of(context).pop();
               Navigator.of(context).push(MaterialPageRoute(
-                  builder: (BuildContext context) => ExerciseScreen()));
+                  builder: (BuildContext context) => ActivitiesScreen(id: id)));
             },
           ),
           ListTile(
@@ -58,7 +63,7 @@ class DrawerList extends StatelessWidget {
             onTap: () {
               Navigator.of(context).pop();
               Navigator.of(context).push(MaterialPageRoute(
-                  builder: (BuildContext context) => SleepScreen()));
+                  builder: (BuildContext context) => SleepScreen(id: id)));
             },
           ),
           ListTile(
@@ -66,8 +71,10 @@ class DrawerList extends StatelessWidget {
             title: Text("Diet"),
             onTap: () {
               Navigator.of(context).pop();
-              Navigator.of(context).push(MaterialPageRoute(
-                  builder: (BuildContext context) => MealScreen()));
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => MealScreen(id: id)),
+              );
             },
           ),
           ListTile(

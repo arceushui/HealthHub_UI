@@ -2,17 +2,22 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get_it/get_it.dart';
+import 'package:healthub_frontend/Model/Meal.dart';
 import 'package:healthub_frontend/ProfileScreen.dart';
 import 'Model/login.dart';
 import 'Service/login_service.dart';
+import 'Service/meal_service.dart';
 import 'Service/profile_service.dart';
 import 'Service/signup_service.dart';
+import 'Service/activity_service.dart';
 import 'SignUp.dart';
 
 void setupLocator() {
   GetIt.I.registerLazySingleton(() => LoginService());
   GetIt.I.registerLazySingleton(() => SignupService());
   GetIt.I.registerLazySingleton(() => ProfileService());
+  GetIt.I.registerLazySingleton(() => ActivityService());
+  GetIt.I.registerLazySingleton(() => MealService());
 }
 
 void main() {
@@ -231,6 +236,7 @@ class _MyAppState extends State<MyApp> {
                                 final user = Login(
                                     username: usernameController.text,
                                     password: passwordController.text);
+
                                 final result = await loginService.login(user);
                                 final id = await loginService.sendId(user);
 
@@ -295,7 +301,8 @@ class _MyAppState extends State<MyApp> {
                       onTap: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => SignUp()),
+                          MaterialPageRoute(
+                              builder: (context) => SignUpScreen()),
                         );
                       },
                       child: Text(

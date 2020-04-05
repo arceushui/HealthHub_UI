@@ -1,39 +1,39 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:healthub_frontend/Widget/DateTimePicker.dart';
 import 'package:healthub_frontend/Widget/DrawerList.dart';
-import 'package:healthub_frontend/Model/Weight.dart';
+import 'package:healthub_frontend/Model/Activity.dart';
 import 'package:flutter/services.dart';
 
 import 'Model/api_response.dart';
-import 'Service/profile_service.dart';
+import 'Service/activity_service.dart';
 import 'package:healthub_frontend/Widget/WeightLineChart.dart';
-import 'package:healthub_frontend/Model/Profile.dart';
-import 'package:healthub_frontend/Model/GenerateProfile.dart';
+import 'package:healthub_frontend/Model/Activities.dart';
 
-class WeightScreen extends StatefulWidget {
+class ActivitiesScreen extends StatefulWidget {
   final String id;
-  WeightScreen({@required this.id});
+  ActivitiesScreen({@required this.id});
   @override
-  _WeightScreenState createState() => _WeightScreenState();
+  _ActivitiesScreenState createState() => _ActivitiesScreenState();
 }
 
-class _WeightScreenState extends State<WeightScreen> {
-  ProfileService get profileService => GetIt.I<ProfileService>();
+class _ActivitiesScreenState extends State<ActivitiesScreen> {
+  ActivityService get activityService => GetIt.I<ActivityService>();
   // String id = "5e8045a1a48f421f4f9ff6c4";
-  APIResponse<Profile> _apiResponse;
-  Profile profile;
+  APIResponse<Activities> _apiResponse;
+  Activities activities;
 
-  Future<Profile> _getProfile() async {
-    _apiResponse = await profileService.getProfile(widget.id);
-    profile = _apiResponse.data;
+  Future<Activities> _getActivities() async {
+    _apiResponse = await activityService.getActivities(widget.id);
+    activities = _apiResponse.data;
 
-    return profile;
+    return activities;
   }
 
-  Widget _futureBuilder(BuildContext context) => FutureBuilder<Profile>(
-        future: _getProfile(), // a Future<String> or null
-        builder: (context, AsyncSnapshot<Profile> snapshot) {
+  Widget _futureBuilder(BuildContext context) => FutureBuilder<Activities>(
+        future: _getActivities(), // a Future<String> or null
+        builder: (context, AsyncSnapshot<Activities> snapshot) {
           switch (snapshot.connectionState) {
             case ConnectionState.none:
               return new Text('Press button to start');
@@ -45,45 +45,43 @@ class _WeightScreenState extends State<WeightScreen> {
               if (snapshot.hasError)
                 return new Text('Error: ${snapshot.error}');
               else {
-                print("snapshot is " + snapshot.data.toString());
+                print("snapshot is " + snapshot.toString());
 
-                return _buildChartAndList(snapshot.data.weights);
+                return _buildChartAndList(snapshot.data.activities.toList());
               }
           }
         },
       );
 
-  Widget _buildChartAndList(weights) => Column(
+  Widget _buildChartAndList(activities) => Column(
         children: <Widget>[
-          new Expanded(child: WeightLineChart.withWeights(weights)),
-          new Expanded(child: _buildList(weights)),
+          // new Expanded(child: WeightLineChart.withWeights(activities)),
+          new Expanded(child: _buildList(activities)),
         ],
       );
 
-  Widget _buildList(weights) => ListView.builder(
-      itemCount: weights.length,
+  Widget _buildList(activities) => ListView.builder(
+      itemCount: activities.length,
       itemBuilder: (BuildContext context, int position) {
-        var weight = weights[position];
+        var activity = activities[position];
         return ListTile(
-            title: Text(weight.weight.toString() + " KG"),
-            subtitle: Text(weight.timestamp.day.toString() +
+            title: Text(activity.activity.toString()),
+            subtitle: Text(activity.date.day.toString() +
                 "/" +
-                weight.timestamp.month.toString() +
+                activity.date.month.toString() +
                 "/" +
-                weight.timestamp.year.toString()));
+                activity.date.year.toString()));
       });
 
-  void saveProfile() {
-    Weight newWeight = Weight(
-        timestamp: DateTime.now(), weight: double.parse(weightController.text));
-    profile.weights.add(newWeight);
-    Profile save = Profile(
-        weights: profile.weights,
-        age: profile.age,
-        height: profile.height,
-        gender: profile.gender);
-    profileService.editProfile(GenerateProfile(profile: save), widget.id);
-    Navigator.of(context).pop();
+  void addActivity() {
+    // Activity _activity = Activity(
+    //     activity: activityController.text,
+    //     caloriBurned: double.parse(caloriesController.text),
+    //     duration: double.parse(durationController.text),
+    //     date: dateController.);
+    // activities.add(_activity);
+    // activityService.addActivity(_activity, widget.id);
+    // Navigator.of(context).pop();
   }
 
   @override
@@ -93,7 +91,10 @@ class _WeightScreenState extends State<WeightScreen> {
 
   var _formKey = GlobalKey<FormState>();
 
-  TextEditingController weightController = TextEditingController();
+  TextEditingController activityController = TextEditingController();
+  TextEditingController durationController = TextEditingController();
+  TextEditingController caloriesController = TextEditingController();
+  DateTimePicker dateTimeController = DateTimePicker();
 
   @override
   Widget build(BuildContext context) {
@@ -102,7 +103,7 @@ class _WeightScreenState extends State<WeightScreen> {
 
     return new Scaffold(
       appBar: AppBar(
-        title: Text("Weight"),
+        title: Text("Activities"),
       ),
       drawer: DrawerList(id: widget.id),
       body: Container(child: _futureBuilder(context)),
@@ -120,11 +121,10 @@ class _WeightScreenState extends State<WeightScreen> {
                             Padding(
                               padding: EdgeInsets.all(8.0),
                               child: TextFormField(
-                                controller: weightController,
+                                controller: activityController,
                                 decoration: const InputDecoration(
-                                    hintText: 'e.g. 50',
-                                    labelText: 'Add Today\'s Weight',
-                                    suffixText: "KG",
+                                    hintText: 'Jogging',
+                                    labelText: 'Activity Name',
                                     labelStyle: TextStyle(fontSize: 20)),
                                 inputFormatters: <TextInputFormatter>[
                                   WhitelistingTextInputFormatter.digitsOnly
@@ -139,14 +139,14 @@ class _WeightScreenState extends State<WeightScreen> {
                                     onPressed: () {
                                       if (_formKey.currentState.validate()) {
                                         _formKey.currentState.save();
-                                        saveProfile();
+                                        addActivity();
                                       }
                                     })),
                           ])));
             },
           );
         },
-        tooltip: 'Add Today\'s Weight',
+        tooltip: 'Add New Activity',
         child: const Icon(Icons.add),
       ),
     );

@@ -37,6 +37,8 @@ ListTile _tile(String title, String subtitle, IconData icon) => ListTile(
     );
 
 class SleepScreen extends StatefulWidget {
+  final String id;
+  SleepScreen({@required this.id});
   @override
   _SleepScreenState createState() => _SleepScreenState();
 }
@@ -50,7 +52,7 @@ class _SleepScreenState extends State<SleepScreen> {
       appBar: AppBar(
         title: Text("Sleep"),
       ),
-      drawer: DrawerList(),
+      drawer: DrawerList(id: widget.id),
       body: Container(
         child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 20),

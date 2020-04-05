@@ -26,7 +26,7 @@ class WeightLineChart extends StatelessWidget {
               behaviorPosition: charts.BehaviorPosition.bottom,
               titleOutsideJustification:
                   charts.OutsideJustification.middleDrawArea),
-          new charts.ChartTitle('Weight (Past 10 Records)',
+          new charts.ChartTitle('Weight',
               behaviorPosition: charts.BehaviorPosition.top,
               titleOutsideJustification: charts.OutsideJustification.start,
               // Set a larger inner padding than the default (10) to avoid

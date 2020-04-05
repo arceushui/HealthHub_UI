@@ -10,17 +10,19 @@ import 'dart:convert';
 import 'package:email_validator/email_validator.dart';
 import 'package:flrx_validator/flrx_validator.dart';
 
+import 'Model/SIgnup.dart';
 
 
-class SignUp extends StatefulWidget {
+
+class SignUpScreen extends StatefulWidget {
   // This widget is the root of your application.
   @override
   _MyAppState createState() => new _MyAppState();
 }
 
-class _MyAppState extends State<SignUp> {
+class _MyAppState extends State<SignUpScreen> {
 
-  SignupService get notesService => GetIt.I<SignupService>();
+  SignupService get signService => GetIt.I<SignupService>();
 
   var _formkey = GlobalKey<FormState>();
 
@@ -251,21 +253,25 @@ class _MyAppState extends State<SignUp> {
                                 color: Colors.transparent,
                                 child: InkWell(
                                   onTap: () async{
+                                    final user = Signup(
+                                        username: usernameController.text,
+                                        password: passwordController.text,
+                                        email: emailController.text
+                                    );
                                     var body;
                                     List listdata;
 
-                                    listdata = listData();
-                                    body = User(username: listdata[0], email: listdata[1], password: listdata[2]).encoder();
-                                    final error=await getUser(body);
+                                    final result = await signService.signup(user);
 
-                                    if(error==422){
+
+                                    if(!result.data){
                                       showDialog(
                                           context: context,
                                           barrierDismissible: true,
                                           builder: (context) {
                                             return AlertDialog(
-                                              title: Text('Error 422'),
-                                              content: Text('Invalid'),
+                                              title: Text('Error'),
+                                              content: Text('Sign Up Failed'),
                                               actions: <Widget>[
                                                 FlatButton(
                                                   child: Text('OK'),

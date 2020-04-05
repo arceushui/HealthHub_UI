@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class SaveAlertDialog extends StatelessWidget {
+class CustomAlertDialog extends StatelessWidget {
 
   String title;
   String content;
@@ -9,7 +9,7 @@ class SaveAlertDialog extends StatelessWidget {
   Function yesOnPressed;
   Function noOnPressed;
 
-  SaveAlertDialog({String title, String content, Function yesOnPressed, Function noOnPressed, String yes = "Confirm", String no = "Cancel"}){
+  CustomAlertDialog({String title, String content, Function yesOnPressed, Function noOnPressed, String yes = "Confirm", String no = "Cancel"}){
     this.title = title;
     this.content = content;
     this.yesOnPressed = yesOnPressed;

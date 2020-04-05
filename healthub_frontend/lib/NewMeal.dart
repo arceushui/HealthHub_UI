@@ -2,34 +2,55 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
+import 'package:get_it/get_it.dart';
+import 'package:healthub_frontend/Model/Meal.dart';
 
+import 'Model/GenerateMeal.dart';
+import 'Service/meal_service.dart';
 import 'Widget/SaveAlertDialog.dart';
 
 class NewMeal extends StatefulWidget {
+  final String id;
+
+  NewMeal({@required this.id});
   @override
   _NewMealState createState() => _NewMealState();
 }
 
-TextEditingController mealNameController = TextEditingController();
-TextEditingController caloriesController = TextEditingController();
-TextEditingController timestampController = TextEditingController();
-TextEditingController ingredientController = TextEditingController();
-
 class _NewMealState extends State<NewMeal> {
   var _formkey = GlobalKey<FormState>();
+  MealService get mealService => GetIt.I<MealService>();
+
+  TextEditingController mealNameController = TextEditingController();
+  TextEditingController caloriesController = TextEditingController();
+  TextEditingController ingredientController = TextEditingController();
 
   int _selectedType = 0;
   List<DropdownMenuItem<int>> typeList = [];
 
   String _date = "Not set";
+  DateTime mealtime;
 
   bool _isChecked = true;
 
   List<String> text = ["Manual Typing"];
 
+  List<String> ingredients = new List<String>();
+  String type;
+  bool delete = true;
+  bool _isLoading = false;
+
   @override
   void initState() {
+    setState(() {
+      _isLoading = true;
+    });
+
     super.initState();
+
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   void loadTypeList() {
@@ -56,13 +77,40 @@ class _NewMealState extends State<NewMeal> {
       onChanged: (value) {
         setState(() {
           _selectedType = value;
+          if (_selectedType == 0)
+            type = "breakfast";
+          else if (_selectedType == 1)
+            type = "lunch";
+          else
+            type = "dinner";
         });
       },
       isExpanded: true,
     );
   }
 
-  void saveMeal() {}
+  void saveMeal() {
+    String auto;
+    double calories;
+
+    if (_isChecked) {
+      auto = "false";
+      calories = double.parse(caloriesController.text);
+    } else {
+      auto = "true";
+      calories = 0.0;
+    }
+    Meal save = Meal(
+        mealName: mealNameController.text,
+        mealTime: mealtime,
+        mealType: type,
+        calories: calories,
+        ingredients: ingredients);
+    print(save);
+
+    mealService.editMeal(GenerateMeal(meals: [save]), widget.id, auto);
+    Navigator.of(context).pop();
+  }
 
   void cancel() {
     Navigator.of(context).pop();
@@ -75,6 +123,10 @@ class _NewMealState extends State<NewMeal> {
 
     loadTypeList();
 
+    if (_isLoading) {
+      return Center(child: CircularProgressIndicator());
+    }
+
     return Scaffold(
         appBar: AppBar(
           title: Text("Add new meal"),
@@ -86,7 +138,7 @@ class _NewMealState extends State<NewMeal> {
                   context: context,
                   barrierDismissible: false, // user must tap button!
                   builder: (BuildContext context) {
-                    return SaveAlertDialog(
+                    return CustomAlertDialog(
                         title: "Confirmation Required",
                         content: "Do you want to save changes to profile?",
                         yesOnPressed: saveMeal,
@@ -191,7 +243,9 @@ class _NewMealState extends State<NewMeal> {
                                               borderSide: BorderSide(
                                                   color: Colors.black)),
                                         ),
-                                        keyboardType: TextInputType.number,
+                                        keyboardType:
+                                            TextInputType.numberWithOptions(
+                                                decimal: true),
                                       ),
                                       Column(
                                         children: <Widget>[
@@ -275,7 +329,9 @@ class _NewMealState extends State<NewMeal> {
                                                         print('confirm $date');
                                                         _date =
                                                             '${date.year} - ${date.month} - ${date.day}';
-                                                        setState(() {});
+                                                        setState(() {
+                                                          mealtime = date;
+                                                        });
                                                       },
                                                           currentTime:
                                                               DateTime.now(),
@@ -369,7 +425,10 @@ class _NewMealState extends State<NewMeal> {
                                         keyboardType: TextInputType.text,
                                       ),
                                       RaisedButton(
-                                        onPressed: () {},
+                                        onPressed: () {
+                                          ingredients
+                                              .add(ingredientController.text);
+                                        },
                                         child: Text("ADD"),
                                       ),
                                       Container(
@@ -378,20 +437,57 @@ class _NewMealState extends State<NewMeal> {
                                             scrollDirection: Axis.horizontal,
                                             shrinkWrap: true,
                                             padding: const EdgeInsets.all(8),
-                                            itemCount: 20,
+                                            itemCount: ingredients.length,
                                             itemBuilder: (BuildContext context,
                                                 int index) {
                                               return Container(
-                                                height: 50,
-                                                color: Colors.amber,
-                                                child: Center(
-                                                    child: Text('Entry')),
-                                              );
+                                                  height: 150,
+                                                  decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10.0),
+                                                    color: Colors.blue,
+                                                  ),
+                                                  child: Column(
+                                                    children: <Widget>[
+                                                      SizedBox(
+                                                        height: 5,
+                                                      ),
+                                                      Center(
+                                                        child: Text(
+                                                          ingredients[index],
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.white,
+                                                              fontSize: 24.0,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w600),
+                                                        ),
+                                                      ),
+                                                      IconButton(
+                                                        icon:
+                                                            Icon(Icons.delete),
+                                                        iconSize: 30,
+                                                        onPressed: () {
+                                                          setState(() {
+                                                            ingredients
+                                                                .removeAt(
+                                                                    index);
+                                                          });
+                                                          print(ingredients);
+                                                        },
+                                                      )
+                                                    ],
+                                                  ));
                                             },
                                             separatorBuilder:
                                                 (BuildContext context,
-                                                        int index) =>
-                                                    const Divider(),
+                                                    int index) {
+                                              return SizedBox(
+                                                width: 15.0,
+                                              );
+                                            },
                                           )),
                                     ],
                                   ),

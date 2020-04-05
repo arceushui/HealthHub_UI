@@ -24,6 +24,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   ProfileService get profileService => GetIt.I<ProfileService>();
 
   APIResponse<Profile> _apiResponse;
+  bool _isLoading = false;
 
   int age;
   int height;
@@ -36,6 +37,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
   TextEditingController ageController = TextEditingController();
 
   _getProfile() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    print(widget.id);
+
     _apiResponse = await profileService.getProfile(widget.id);
 
     weights = _apiResponse.data.weights;
@@ -51,6 +58,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
       _selectedGender = 0;
     else
       _selectedGender = 1;
+
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   List<DropdownMenuItem<int>> genderList = [];
@@ -124,6 +135,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     loadGenderList();
 
+    if (_isLoading) {
+      return Center(child: CircularProgressIndicator());
+    }
+
     return Scaffold(
         appBar: AppBar(
           title: Text("Profile"),
@@ -135,7 +150,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   context: context,
                   barrierDismissible: false, // user must tap button!
                   builder: (BuildContext context) {
-                    return SaveAlertDialog(
+                    return CustomAlertDialog(
                         title: "Confirmation Required",
                         content: "Do you want to save changes to profile?",
                         yesOnPressed: saveProfile,
@@ -146,7 +161,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             )
           ],
         ),
-        drawer: DrawerList(),
+        drawer: DrawerList(id: widget.id),
         body: Stack(
           children: <Widget>[
             Padding(

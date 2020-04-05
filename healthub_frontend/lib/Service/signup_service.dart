@@ -16,11 +16,11 @@ class SignupService {
       print(json.encode(item.toJson()));
       print(data.statusCode);
       print(data.body);
-      if (data.statusCode == 200 && (data.body == "Sign up is successful")) {
+      if (data.statusCode == 202 && (data.body == "Sign up is successful")) {
         return APIResponse<bool>(data: true);
       }
       else{
-        return APIResponse<bool>(error: true, errorMessage: 'An error occured');
+        return APIResponse<bool>(data: false, errorMessage: 'An error occured');
       }
     })
         .catchError((_) => APIResponse<bool>(error: true, errorMessage: 'An error occured'));
