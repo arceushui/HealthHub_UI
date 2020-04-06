@@ -1,24 +1,23 @@
-import 'package:healthub_frontend/Model/Activity.dart';
-import 'package:collection/collection.dart';
+import 'package:healthub_frontend/Model/Sleep.dart';
 
-class Activities {
-  List<Activity> activities;
-  Activities({this.activities});
+class SleepStore {
+  List<Sleep> sleeping;
+  SleepStore({this.sleeping});
 
-  factory Activities.fromJson(Map<String, dynamic> json) {
-    List<Activity> _activities = new List<Activity>();
-    if (json['activities'] != null) {
-      json['activities'].forEach((v) {
-        _activities.add(new Activity.fromJson(v));
+  factory SleepStore.fromJson(Map<String, dynamic> json) {
+    List<Sleep> _sleeping = new List<Sleep>();
+    if (json['sleeping'] != null) {
+      json['sleeping'].forEach((v) {
+        _sleeping.add(new Sleep.fromJson(v));
       });
     }
-    return Activities(activities: _activities);
+    return SleepStore(sleeping: _sleeping);
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    if (this.activities != null) {
-      data['activities'] = this.activities.map((v) => v.toJson()).toList();
+    if (this.sleeping != null) {
+      data['sleeping'] = this.sleeping.map((v) => v.toJson()).toList();
     }
     return data;
   }

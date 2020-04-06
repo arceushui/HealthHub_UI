@@ -8,8 +8,8 @@ import 'package:healthub_frontend/Model/Sleep.dart';
 import 'package:flutter/services.dart';
 
 import 'Model/api_response.dart';
-import 'Service/activity_service.dart';
-import 'package:healthub_frontend/Widget/charts/ActivityBarChart.dart';
+import 'Service/sleep_service.dart';
+import 'package:healthub_frontend/Widget/charts/SleepBarChart.dart';
 import 'package:healthub_frontend/Model/SleepStore.dart';
 
 class SleepScreen extends StatefulWidget {
@@ -20,7 +20,7 @@ class SleepScreen extends StatefulWidget {
 }
 
 class _SleepScreenState extends State<SleepScreen> {
-  ActivityService get activityService => GetIt.I<ActivityService>();
+  SleepService get sleepService => GetIt.I<SleepService>();
   // String id = "5e8045a1a48f421f4f9ff6c4";
   APIResponse<SleepStore> _apiResponse;
   SleepStore sleeping;
@@ -54,7 +54,7 @@ class _SleepScreenState extends State<SleepScreen> {
 
   Widget _buildChartAndList(sleeping) => Column(
         children: <Widget>[
-          new Expanded(child: SleepBarChart.withSleepStore(sleeping)),
+          new Expanded(child: SleepBarChart.withSleeping(sleeping)),
           new Expanded(child: _buildList(sleeping)),
         ],
       );
@@ -70,7 +70,12 @@ class _SleepScreenState extends State<SleepScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Text(
-                  activity.duration,
+                  sleep.sleepingTime
+                      .toString()
+                      .split(" ")[0]
+                      .split("-")
+                      .reversed
+                      .join("/"),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
@@ -80,20 +85,9 @@ class _SleepScreenState extends State<SleepScreen> {
                 ),
                 const Padding(padding: EdgeInsets.only(bottom: 2.0)),
                 Text(
-                  sleep.sleepingTime
-                      .split("T")[0]
-                      .split("-")
-                      .reversed
-                      .join("/"),
+                  sleep.duration.toStringAsFixed(1) + " hours",
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 12.0,
-                    color: Colors.black54,
-                  ),
-                ),
-                Text(
-                  DateTime.parse(sleep.sleepingTime),
                   style: const TextStyle(
                     fontSize: 12.0,
                     color: Colors.black54,
@@ -105,14 +99,13 @@ class _SleepScreenState extends State<SleepScreen> {
 
   void addSleep(confirmedSleepTime) async {
     SleepStore _sleeping = new SleepStore();
-    confirmedSleepTime = confirmedSleepTime.replaceAll(" ", "T");
     Sleep _sleep = Sleep(
-      duration: durationController.text,
+      duration: double.parse(durationController.text),
       sleepingTime: confirmedSleepTime,
     );
     _sleeping.sleeping = new List<Sleep>();
     _sleeping.sleeping.add(_sleep);
-    await activityService.addSleepStore(_sleeping, widget.id);
+    await sleepService.addSleepStore(_sleeping, widget.id);
     setState(() {});
     Navigator.of(context).pop();
   }
@@ -140,7 +133,7 @@ class _SleepScreenState extends State<SleepScreen> {
       body: Container(child: _futureBuilder(context)),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          String confirmedSleepTime = sleepTimeController.text;
+          DateTime confirmedSleepTime;
           showDialog(
             context: context,
             builder: (BuildContext context) {
@@ -160,19 +153,23 @@ class _SleepScreenState extends State<SleepScreen> {
                                 onTap: () {
                                   FocusScope.of(context)
                                       .requestFocus(new FocusNode());
-                                  DatePicker.showDatePicker(context,
+                                  DatePicker.showDateTimePicker(context,
                                       showTitleActions: true,
-                                      minTime: DateTime.now()
-                                          .subtract(new Duration(days: 365)),
-                                      maxTime: DateTime.now(),
+                                      // minTime: DateTime.now()
+                                      //     .subtract(new Duration(days: 365)),
+                                      // maxTime: DateTime.now(),
                                       onChanged: (date) {}, onConfirm: (date) {
-                                    confirmedSleepTime = date.toString();
+                                    confirmedSleepTime = date;
                                     sleepTimeController.text =
                                         date.day.toString() +
                                             "/" +
                                             date.month.toString() +
                                             "/" +
-                                            date.year.toString();
+                                            date.year.toString() +
+                                            " " +
+                                            date.hour.toString() +
+                                            ":" +
+                                            date.minute.toString();
                                   }, currentTime: DateTime.now());
                                 },
                               ),

@@ -11,6 +11,7 @@ import 'Service/profile_service.dart';
 import 'Service/signup_service.dart';
 import 'Service/prescription_service.dart';
 import 'Service/activity_service.dart';
+import 'Service/sleep_service.dart';
 import 'SignUp.dart';
 
 void setupLocator() {
@@ -20,6 +21,7 @@ void setupLocator() {
   GetIt.I.registerLazySingleton(() => ActivityService());
   GetIt.I.registerLazySingleton(() => MealService());
   GetIt.I.registerLazySingleton(() => PrescriptionService());
+  GetIt.I.registerLazySingleton(() => SleepService());
 }
 
 void main() {
