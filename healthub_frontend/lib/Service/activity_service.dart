@@ -21,12 +21,13 @@ class ActivityService {
         APIResponse<Activities>(error: true, errorMessage: 'An error occured'));
   }
 
-  Future<APIResponse<String>> addActivity(Activity activity, String id) {
+  Future<APIResponse<String>> addActivities(Activities activities, String id) {
     return http
         .post(API + '/activity?id=' + id,
-            headers: headers, body: json.encode(activity.toJson()))
+            headers: headers, body: json.encode(activities.toJson()))
         .then((data) {
       return APIResponse<String>(data: data.body);
-    });
+    }).catchError((data) => APIResponse<Activities>(
+            error: true, errorMessage: data.body.error));
   }
 }

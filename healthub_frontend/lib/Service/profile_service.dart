@@ -23,7 +23,6 @@ class ProfileService {
   }
 
   Future<APIResponse<String>> editProfile(GenerateProfile item, String id) {
-    print("NANI" + item.profile.weights.last.weight.toString());
     return http
         .post(API + '/healthprofile?id=' + id,
             headers: headers, body: json.encode(item.toJson()))

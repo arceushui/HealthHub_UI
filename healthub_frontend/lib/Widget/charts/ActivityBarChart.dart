@@ -48,7 +48,7 @@ class ActivityBarChart extends StatelessWidget {
       new charts.Series<Activity, DateTime>(
         id: 'Activities',
         colorFn: (_, __) => charts.MaterialPalette.red.shadeDefault,
-        domainFn: (Activity activity, _) => activity.date,
+        domainFn: (Activity activity, _) => DateTime.parse(activity.date),
         measureFn: (Activity activity, _) => activity.caloriBurned,
         data: activity,
       ),

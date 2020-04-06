@@ -45,8 +45,6 @@ class _WeightScreenState extends State<WeightScreen> {
               if (snapshot.hasError)
                 return new Text('Error: ${snapshot.error}');
               else {
-                print("snapshot is " + snapshot.data.toString());
-
                 return _buildChartAndList(snapshot.data.weights);
               }
           }

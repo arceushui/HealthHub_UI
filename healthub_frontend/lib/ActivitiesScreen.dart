@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:healthub_frontend/Widget/DateTimePicker.dart';
+import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
+
 import 'package:healthub_frontend/Widget/DrawerList.dart';
 import 'package:healthub_frontend/Model/Activity.dart';
 import 'package:flutter/services.dart';
@@ -45,8 +46,6 @@ class _ActivitiesScreenState extends State<ActivitiesScreen> {
               if (snapshot.hasError)
                 return new Text('Error: ${snapshot.error}');
               else {
-                print("snapshot is " + snapshot.toString());
-
                 return _buildChartAndList(snapshot.data.activities.toList());
               }
           }
@@ -71,20 +70,17 @@ class _ActivitiesScreenState extends State<ActivitiesScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Text(
-                  "Activity Name: " + activity.activity,
+                  activity.activity,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
+                    fontSize: 15,
                   ),
                 ),
                 const Padding(padding: EdgeInsets.only(bottom: 2.0)),
                 Text(
-                  activity.date.day.toString() +
-                      "/" +
-                      activity.date.month.toString() +
-                      "/" +
-                      activity.date.year.toString(),
+                  activity.date.split("T")[0].split("-").reversed.join("/"),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
@@ -96,7 +92,7 @@ class _ActivitiesScreenState extends State<ActivitiesScreen> {
                   activity.caloriBurned.toStringAsFixed(1) +
                       " cal" +
                       " ★ " +
-                      activity.duration.toString() +
+                      activity.duration.toStringAsFixed(1) +
                       "h",
                   style: const TextStyle(
                     fontSize: 12.0,
@@ -107,15 +103,17 @@ class _ActivitiesScreenState extends State<ActivitiesScreen> {
             ));
       });
 
-  void addActivity() {
-    List<Activity> _activities = [];
+  void addActivity(confirmedDate) {
+    Activities _activities = new Activities();
+    confirmedDate = confirmedDate.replaceAll(" ", "T");
     Activity _activity = Activity(
         activity: activityController.text,
         caloriBurned: double.parse(caloriesController.text),
         duration: double.parse(durationController.text),
-        date: DateTime.now());
-    _activities.add(_activity);
-    activityService.addActivity(_activity, widget.id);
+        date: confirmedDate);
+    _activities.activities = new List<Activity>();
+    _activities.activities.add(_activity);
+    activityService.addActivities(_activities, widget.id);
     Navigator.of(context).pop();
   }
 
@@ -129,7 +127,7 @@ class _ActivitiesScreenState extends State<ActivitiesScreen> {
   TextEditingController activityController = TextEditingController();
   TextEditingController durationController = TextEditingController();
   TextEditingController caloriesController = TextEditingController();
-  TextEditingController dateTimeController = TextEditingController();
+  TextEditingController dateController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -144,6 +142,7 @@ class _ActivitiesScreenState extends State<ActivitiesScreen> {
       body: Container(child: _futureBuilder(context)),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
+          String confirmedDate = dateController.text;
           showDialog(
             context: context,
             builder: (BuildContext context) {
@@ -172,9 +171,6 @@ class _ActivitiesScreenState extends State<ActivitiesScreen> {
                                     hintText: '25',
                                     labelText: 'Calories Burned',
                                     labelStyle: TextStyle(fontSize: 15)),
-                                inputFormatters: <TextInputFormatter>[
-                                  WhitelistingTextInputFormatter.digitsOnly
-                                ],
                                 keyboardType: TextInputType.number,
                               ),
                             ),
@@ -186,24 +182,36 @@ class _ActivitiesScreenState extends State<ActivitiesScreen> {
                                     hintText: 'Hours',
                                     labelText: 'Duration',
                                     labelStyle: TextStyle(fontSize: 15)),
-                                inputFormatters: <TextInputFormatter>[
-                                  WhitelistingTextInputFormatter.digitsOnly
-                                ],
                                 keyboardType: TextInputType.number,
                               ),
                             ),
                             Padding(
                               padding: EdgeInsets.all(8.0),
                               child: TextFormField(
-                                controller: dateTimeController,
+                                controller: dateController,
                                 decoration: const InputDecoration(
-                                    hintText: 'Jogging',
-                                    labelText: 'Activity Name',
-                                    labelStyle: TextStyle(fontSize: 20)),
+                                    labelText: 'Date',
+                                    labelStyle: TextStyle(fontSize: 15)),
                                 onTap: () {
                                   FocusScope.of(context)
                                       .requestFocus(new FocusNode());
-                                  return DateTimePicker();
+                                  DatePicker.showDatePicker(context,
+                                      showTitleActions: true,
+                                      minTime: DateTime.now()
+                                          .subtract(new Duration(days: 365)),
+                                      maxTime: DateTime.now(),
+                                      onChanged: (date) {
+                                    print('change $date');
+                                  }, onConfirm: (date) {
+                                    print('confirm $date');
+                                    confirmedDate = date.toString();
+                                    print('confirmedDate is $confirmedDate');
+                                    dateController.text = date.day.toString() +
+                                        "/" +
+                                        date.month.toString() +
+                                        "/" +
+                                        date.year.toString();
+                                  }, currentTime: DateTime.now());
                                 },
                               ),
                             ),
@@ -214,7 +222,7 @@ class _ActivitiesScreenState extends State<ActivitiesScreen> {
                                     onPressed: () {
                                       if (_formKey.currentState.validate()) {
                                         _formKey.currentState.save();
-                                        addActivity();
+                                        addActivity(confirmedDate);
                                       }
                                     })),
                           ])));

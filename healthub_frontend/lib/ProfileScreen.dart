@@ -41,8 +41,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
       _isLoading = true;
     });
 
-    print(widget.id);
-
     _apiResponse = await profileService.getProfile(widget.id);
 
     weights = _apiResponse.data.weights;
@@ -111,15 +109,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
     List<Weight> list = [];
     Weight updatedweight = Weight(
         timestamp: DateTime.now(), weight: double.parse(weightController.text));
-    print(updatedweight);
     list.add(updatedweight);
-    print(list);
     Profile save = Profile(
         weights: list,
         age: int.parse(ageController.text),
         height: int.parse(heightController.text),
         gender: gender);
-    print(gender);
     profileService.editProfile(GenerateProfile(profile: save), widget.id);
     Navigator.of(context).pop();
   }
