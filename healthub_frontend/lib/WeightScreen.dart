@@ -36,7 +36,7 @@ class _WeightScreenState extends State<WeightScreen> {
         builder: (context, AsyncSnapshot<Profile> snapshot) {
           switch (snapshot.connectionState) {
             case ConnectionState.none:
-              return new Text('Press button to start');
+              return new Text('No Connection');
             case ConnectionState.waiting:
               return Center(
                   child: CircularProgressIndicator(
@@ -72,7 +72,7 @@ class _WeightScreenState extends State<WeightScreen> {
                 weight.timestamp.year.toString()));
       });
 
-  void saveProfile() {
+  void saveProfile() async {
     Weight newWeight = Weight(
         timestamp: DateTime.now(), weight: double.parse(weightController.text));
     List<Weight> _newWeight = [];
@@ -82,7 +82,8 @@ class _WeightScreenState extends State<WeightScreen> {
         age: profile.age,
         height: profile.height,
         gender: profile.gender);
-    profileService.editProfile(GenerateProfile(profile: save), widget.id);
+    await profileService.editProfile(GenerateProfile(profile: save), widget.id);
+    setState(() {});
     Navigator.of(context).pop();
   }
 

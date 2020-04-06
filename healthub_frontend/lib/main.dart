@@ -9,6 +9,7 @@ import 'Service/login_service.dart';
 import 'Service/meal_service.dart';
 import 'Service/profile_service.dart';
 import 'Service/signup_service.dart';
+import 'Service/prescription_service.dart';
 import 'Service/activity_service.dart';
 import 'SignUp.dart';
 
@@ -18,6 +19,7 @@ void setupLocator() {
   GetIt.I.registerLazySingleton(() => ProfileService());
   GetIt.I.registerLazySingleton(() => ActivityService());
   GetIt.I.registerLazySingleton(() => MealService());
+  GetIt.I.registerLazySingleton(() => PrescriptionService());
 }
 
 void main() {

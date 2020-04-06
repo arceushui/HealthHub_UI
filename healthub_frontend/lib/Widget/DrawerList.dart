@@ -1,5 +1,6 @@
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/material.dart';
+import 'package:healthub_frontend/PrescriptionScreen.dart';
 import 'package:healthub_frontend/ProfileScreen.dart';
 import 'package:healthub_frontend/WeightScreen.dart';
 import 'package:healthub_frontend/ActivitiesScreen.dart';
@@ -80,6 +81,14 @@ class DrawerList extends StatelessWidget {
           ListTile(
             leading: Icon(Icons.description),
             title: Text("Prescription"),
+            onTap: () {
+              Navigator.of(context).pop();
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => PrescriptionScreen(id: id)),
+              );
+            },
           ),
           ListTile(
             leading: Icon(Icons.forum),

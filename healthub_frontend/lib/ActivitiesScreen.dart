@@ -37,7 +37,7 @@ class _ActivitiesScreenState extends State<ActivitiesScreen> {
         builder: (context, AsyncSnapshot<Activities> snapshot) {
           switch (snapshot.connectionState) {
             case ConnectionState.none:
-              return new Text('Press button to start');
+              return new Text('No Connection');
             case ConnectionState.waiting:
               return Center(
                   child: CircularProgressIndicator(
@@ -103,7 +103,7 @@ class _ActivitiesScreenState extends State<ActivitiesScreen> {
             ));
       });
 
-  void addActivity(confirmedDate) {
+  void addActivity(confirmedDate) async {
     Activities _activities = new Activities();
     confirmedDate = confirmedDate.replaceAll(" ", "T");
     Activity _activity = Activity(
@@ -113,7 +113,8 @@ class _ActivitiesScreenState extends State<ActivitiesScreen> {
         date: confirmedDate);
     _activities.activities = new List<Activity>();
     _activities.activities.add(_activity);
-    activityService.addActivities(_activities, widget.id);
+    await activityService.addActivities(_activities, widget.id);
+    setState(() {});
     Navigator.of(context).pop();
   }
 
@@ -200,12 +201,8 @@ class _ActivitiesScreenState extends State<ActivitiesScreen> {
                                       minTime: DateTime.now()
                                           .subtract(new Duration(days: 365)),
                                       maxTime: DateTime.now(),
-                                      onChanged: (date) {
-                                    print('change $date');
-                                  }, onConfirm: (date) {
-                                    print('confirm $date');
+                                      onChanged: (date) {}, onConfirm: (date) {
                                     confirmedDate = date.toString();
-                                    print('confirmedDate is $confirmedDate');
                                     dateController.text = date.day.toString() +
                                         "/" +
                                         date.month.toString() +

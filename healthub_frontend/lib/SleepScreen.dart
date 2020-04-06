@@ -1,40 +1,16 @@
-import 'package:flappy_search_bar/flappy_search_bar.dart';
-import 'package:flappy_search_bar/search_bar_style.dart';
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
+
 import 'package:healthub_frontend/Widget/DrawerList.dart';
+import 'package:healthub_frontend/Model/Sleep.dart';
+import 'package:flutter/services.dart';
 
-Widget _buildList() => ListView(
-      children: [
-        _tile('CineArts at the Empire', '85 W Portal Ave', Icons.theaters),
-        _tile('The Castro Theater', '429 Castro St', Icons.theaters),
-        _tile('Alamo Drafthouse Cinema', '2550 Mission St', Icons.theaters),
-        _tile('Roxie Theater', '3117 16th St', Icons.theaters),
-        _tile('United Artists Stonestown Twin', '501 Buckingham Way',
-            Icons.theaters),
-        _tile('AMC Metreon 16', '135 4th St #3000', Icons.theaters),
-        Divider(),
-        _tile('Kescaped_code#39;s Kitchen', '757 Monterey Blvd',
-            Icons.restaurant),
-        _tile('Emmyescaped_code#39;s Restaurant', '1923 Ocean Ave',
-            Icons.restaurant),
-        _tile('Chaiya Thai Restaurant', '272 Claremont Blvd', Icons.restaurant),
-        _tile('La Ciccia', '291 30th St', Icons.restaurant),
-      ],
-    );
-
-ListTile _tile(String title, String subtitle, IconData icon) => ListTile(
-      title: Text(title,
-          style: TextStyle(
-            fontWeight: FontWeight.w500,
-            fontSize: 20,
-          )),
-      subtitle: Text(subtitle),
-      leading: Icon(
-        icon,
-        color: Colors.blue[500],
-      ),
-    );
+import 'Model/api_response.dart';
+import 'Service/activity_service.dart';
+import 'package:healthub_frontend/Widget/charts/ActivityBarChart.dart';
+import 'package:healthub_frontend/Model/SleepStore.dart';
 
 class SleepScreen extends StatefulWidget {
   final String id;
@@ -44,23 +20,189 @@ class SleepScreen extends StatefulWidget {
 }
 
 class _SleepScreenState extends State<SleepScreen> {
+  ActivityService get activityService => GetIt.I<ActivityService>();
+  // String id = "5e8045a1a48f421f4f9ff6c4";
+  APIResponse<SleepStore> _apiResponse;
+  SleepStore sleeping;
+
+  Future<SleepStore> _getSleepStore() async {
+    _apiResponse = await sleepService.getSleepStore(widget.id);
+    sleeping = _apiResponse.data;
+
+    return sleeping;
+  }
+
+  Widget _futureBuilder(BuildContext context) => FutureBuilder<SleepStore>(
+        future: _getSleepStore(), // a Future<String> or null
+        builder: (context, AsyncSnapshot<SleepStore> snapshot) {
+          switch (snapshot.connectionState) {
+            case ConnectionState.none:
+              return new Text('No Connection');
+            case ConnectionState.waiting:
+              return Center(
+                  child: CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.blue)));
+            default:
+              if (snapshot.hasError)
+                return new Text('Error: ${snapshot.error}');
+              else {
+                return _buildChartAndList(snapshot.data.sleeping.toList());
+              }
+          }
+        },
+      );
+
+  Widget _buildChartAndList(sleeping) => Column(
+        children: <Widget>[
+          new Expanded(child: SleepBarChart.withSleepStore(sleeping)),
+          new Expanded(child: _buildList(sleeping)),
+        ],
+      );
+
+  Widget _buildList(sleeping) => ListView.separated(
+      itemCount: sleeping.length,
+      separatorBuilder: (BuildContext context, int index) => Divider(),
+      itemBuilder: (BuildContext context, int position) {
+        var sleep = sleeping[position];
+        return Padding(
+            padding: const EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 20.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(
+                  activity.duration,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
+                  ),
+                ),
+                const Padding(padding: EdgeInsets.only(bottom: 2.0)),
+                Text(
+                  sleep.sleepingTime
+                      .split("T")[0]
+                      .split("-")
+                      .reversed
+                      .join("/"),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 12.0,
+                    color: Colors.black54,
+                  ),
+                ),
+                Text(
+                  DateTime.parse(sleep.sleepingTime),
+                  style: const TextStyle(
+                    fontSize: 12.0,
+                    color: Colors.black54,
+                  ),
+                ),
+              ],
+            ));
+      });
+
+  void addSleep(confirmedSleepTime) async {
+    SleepStore _sleeping = new SleepStore();
+    confirmedSleepTime = confirmedSleepTime.replaceAll(" ", "T");
+    Sleep _sleep = Sleep(
+      duration: durationController.text,
+      sleepingTime: confirmedSleepTime,
+    );
+    _sleeping.sleeping = new List<Sleep>();
+    _sleeping.sleeping.add(_sleep);
+    await activityService.addSleepStore(_sleeping, widget.id);
+    setState(() {});
+    Navigator.of(context).pop();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  var _formKey = GlobalKey<FormState>();
+
+  TextEditingController sleepTimeController = TextEditingController();
+  TextEditingController durationController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     ScreenUtil.instance = ScreenUtil.getInstance()..init(context);
     ScreenUtil.instance = ScreenUtil(allowFontScaling: true);
+
     return new Scaffold(
       appBar: AppBar(
         title: Text("Sleep"),
       ),
       drawer: DrawerList(id: widget.id),
-      body: Container(
-        child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 20),
-            child: _buildList()),
-      ),
+      body: Container(child: _futureBuilder(context)),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => {},
-        tooltip: 'Increment Counter',
+        onPressed: () {
+          String confirmedSleepTime = sleepTimeController.text;
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                  content: Form(
+                      key: _formKey,
+                      child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: <Widget>[
+                            Padding(
+                              padding: EdgeInsets.all(8.0),
+                              child: TextFormField(
+                                controller: sleepTimeController,
+                                decoration: const InputDecoration(
+                                    labelText: 'Sleep Start Time',
+                                    labelStyle: TextStyle(fontSize: 15)),
+                                onTap: () {
+                                  FocusScope.of(context)
+                                      .requestFocus(new FocusNode());
+                                  DatePicker.showDatePicker(context,
+                                      showTitleActions: true,
+                                      minTime: DateTime.now()
+                                          .subtract(new Duration(days: 365)),
+                                      maxTime: DateTime.now(),
+                                      onChanged: (date) {}, onConfirm: (date) {
+                                    confirmedSleepTime = date.toString();
+                                    sleepTimeController.text =
+                                        date.day.toString() +
+                                            "/" +
+                                            date.month.toString() +
+                                            "/" +
+                                            date.year.toString();
+                                  }, currentTime: DateTime.now());
+                                },
+                              ),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.all(8.0),
+                              child: TextFormField(
+                                controller: durationController,
+                                decoration: const InputDecoration(
+                                    hintText: 'Hours',
+                                    labelText: 'Sleep Duration',
+                                    labelStyle: TextStyle(fontSize: 15)),
+                                keyboardType: TextInputType.text,
+                              ),
+                            ),
+                            Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: RaisedButton(
+                                    child: Text("Submit"),
+                                    onPressed: () {
+                                      if (_formKey.currentState.validate()) {
+                                        _formKey.currentState.save();
+                                        addSleep(confirmedSleepTime);
+                                      }
+                                    })),
+                          ])));
+            },
+          );
+        },
+        tooltip: 'Add New Sleep',
         child: const Icon(Icons.add),
       ),
     );
