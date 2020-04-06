@@ -43,8 +43,8 @@ class WeightLineChart extends StatelessWidget {
       new charts.Series<Weight, DateTime>(
         id: 'Weights',
         colorFn: (_, __) => charts.MaterialPalette.blue.shadeDefault,
-        domainFn: (Weight weights, _) => weights.timestamp,
-        measureFn: (Weight weights, _) => weights.weight,
+        domainFn: (Weight weight, _) => weight.timestamp,
+        measureFn: (Weight weight, _) => weight.weight,
         data: weights,
       ),
     ];

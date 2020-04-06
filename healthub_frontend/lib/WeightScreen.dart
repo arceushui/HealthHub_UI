@@ -7,7 +7,7 @@ import 'package:flutter/services.dart';
 
 import 'Model/api_response.dart';
 import 'Service/profile_service.dart';
-import 'package:healthub_frontend/Widget/WeightLineChart.dart';
+import 'package:healthub_frontend/Widget/charts/WeightLineChart.dart';
 import 'package:healthub_frontend/Model/Profile.dart';
 import 'package:healthub_frontend/Model/GenerateProfile.dart';
 
@@ -60,8 +60,9 @@ class _WeightScreenState extends State<WeightScreen> {
         ],
       );
 
-  Widget _buildList(weights) => ListView.builder(
+  Widget _buildList(weights) => ListView.separated(
       itemCount: weights.length,
+      separatorBuilder: (BuildContext context, int index) => Divider(),
       itemBuilder: (BuildContext context, int position) {
         var weight = weights[position];
         return ListTile(
@@ -76,9 +77,10 @@ class _WeightScreenState extends State<WeightScreen> {
   void saveProfile() {
     Weight newWeight = Weight(
         timestamp: DateTime.now(), weight: double.parse(weightController.text));
-    profile.weights.add(newWeight);
+    List<Weight> _newWeight = [];
+    _newWeight.add(newWeight);
     Profile save = Profile(
-        weights: profile.weights,
+        weights: _newWeight,
         age: profile.age,
         height: profile.height,
         gender: profile.gender);

@@ -8,7 +8,7 @@ import 'package:flutter/services.dart';
 
 import 'Model/api_response.dart';
 import 'Service/activity_service.dart';
-import 'package:healthub_frontend/Widget/WeightLineChart.dart';
+import 'package:healthub_frontend/Widget/charts/ActivityBarChart.dart';
 import 'package:healthub_frontend/Model/Activities.dart';
 
 class ActivitiesScreen extends StatefulWidget {
@@ -55,33 +55,68 @@ class _ActivitiesScreenState extends State<ActivitiesScreen> {
 
   Widget _buildChartAndList(activities) => Column(
         children: <Widget>[
-          // new Expanded(child: WeightLineChart.withWeights(activities)),
+          new Expanded(child: ActivityBarChart.withActivities(activities)),
           new Expanded(child: _buildList(activities)),
         ],
       );
 
-  Widget _buildList(activities) => ListView.builder(
+  Widget _buildList(activities) => ListView.separated(
       itemCount: activities.length,
+      separatorBuilder: (BuildContext context, int index) => Divider(),
       itemBuilder: (BuildContext context, int position) {
         var activity = activities[position];
-        return ListTile(
-            title: Text(activity.activity.toString()),
-            subtitle: Text(activity.date.day.toString() +
-                "/" +
-                activity.date.month.toString() +
-                "/" +
-                activity.date.year.toString()));
+        return Padding(
+            padding: const EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 20.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(
+                  "Activity Name: " + activity.activity,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const Padding(padding: EdgeInsets.only(bottom: 2.0)),
+                Text(
+                  activity.date.day.toString() +
+                      "/" +
+                      activity.date.month.toString() +
+                      "/" +
+                      activity.date.year.toString(),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 12.0,
+                    color: Colors.black54,
+                  ),
+                ),
+                Text(
+                  activity.caloriBurned.toStringAsFixed(1) +
+                      " cal" +
+                      " ★ " +
+                      activity.duration.toString() +
+                      "h",
+                  style: const TextStyle(
+                    fontSize: 12.0,
+                    color: Colors.black54,
+                  ),
+                ),
+              ],
+            ));
       });
 
   void addActivity() {
-    // Activity _activity = Activity(
-    //     activity: activityController.text,
-    //     caloriBurned: double.parse(caloriesController.text),
-    //     duration: double.parse(durationController.text),
-    //     date: dateController.);
-    // activities.add(_activity);
-    // activityService.addActivity(_activity, widget.id);
-    // Navigator.of(context).pop();
+    List<Activity> _activities = [];
+    Activity _activity = Activity(
+        activity: activityController.text,
+        caloriBurned: double.parse(caloriesController.text),
+        duration: double.parse(durationController.text),
+        date: DateTime.now());
+    _activities.add(_activity);
+    activityService.addActivity(_activity, widget.id);
+    Navigator.of(context).pop();
   }
 
   @override
@@ -94,7 +129,7 @@ class _ActivitiesScreenState extends State<ActivitiesScreen> {
   TextEditingController activityController = TextEditingController();
   TextEditingController durationController = TextEditingController();
   TextEditingController caloriesController = TextEditingController();
-  DateTimePicker dateTimeController = DateTimePicker();
+  TextEditingController dateTimeController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -125,11 +160,51 @@ class _ActivitiesScreenState extends State<ActivitiesScreen> {
                                 decoration: const InputDecoration(
                                     hintText: 'Jogging',
                                     labelText: 'Activity Name',
-                                    labelStyle: TextStyle(fontSize: 20)),
+                                    labelStyle: TextStyle(fontSize: 15)),
+                                keyboardType: TextInputType.text,
+                              ),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.all(8.0),
+                              child: TextFormField(
+                                controller: caloriesController,
+                                decoration: const InputDecoration(
+                                    hintText: '25',
+                                    labelText: 'Calories Burned',
+                                    labelStyle: TextStyle(fontSize: 15)),
                                 inputFormatters: <TextInputFormatter>[
                                   WhitelistingTextInputFormatter.digitsOnly
                                 ],
                                 keyboardType: TextInputType.number,
+                              ),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.all(8.0),
+                              child: TextFormField(
+                                controller: durationController,
+                                decoration: const InputDecoration(
+                                    hintText: 'Hours',
+                                    labelText: 'Duration',
+                                    labelStyle: TextStyle(fontSize: 15)),
+                                inputFormatters: <TextInputFormatter>[
+                                  WhitelistingTextInputFormatter.digitsOnly
+                                ],
+                                keyboardType: TextInputType.number,
+                              ),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.all(8.0),
+                              child: TextFormField(
+                                controller: dateTimeController,
+                                decoration: const InputDecoration(
+                                    hintText: 'Jogging',
+                                    labelText: 'Activity Name',
+                                    labelStyle: TextStyle(fontSize: 20)),
+                                onTap: () {
+                                  FocusScope.of(context)
+                                      .requestFocus(new FocusNode());
+                                  return DateTimePicker();
+                                },
                               ),
                             ),
                             Padding(
