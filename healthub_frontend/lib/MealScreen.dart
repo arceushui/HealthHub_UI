@@ -25,7 +25,6 @@ List<DateTime> mealTime = [DateTime(2010, 9, 23)];
 var formatter = new DateFormat('yyyy-MM-dd');
 
 class _MealScreenState extends State<MealScreen> {
-
   MealService get mealService => GetIt.I<MealService>();
 
   APIResponse<GenerateMeal> _apiResponse;
@@ -36,10 +35,7 @@ class _MealScreenState extends State<MealScreen> {
 
   List<DateTime> mealTime = new List<DateTime>();
 
-
-
   _getMeal() async {
-
     setState(() {
       _isLoading = true;
     });
@@ -47,34 +43,30 @@ class _MealScreenState extends State<MealScreen> {
     print(widget.id);
     _apiResponse = await mealService.getMeal(widget.id);
 
-    mealTime =[];
-
-
+    mealTime = [];
 
     list = _apiResponse.data.meals.toList();
     print(list);
-    for(var i = 0; i < list.length; i++) {
+    for (var i = 0; i < list.length; i++) {
       if (i != 0) {
-        if (formatter.format(list[i].mealTime) != formatter.format(list[i - 1].mealTime)) {
+        if (formatter.format(list[i].mealTime) !=
+            formatter.format(list[i - 1].mealTime)) {
           mealTime.add(list[i].mealTime);
         }
-      }
-      else
+      } else
         mealTime.add(list[i].mealTime);
     }
 
     print(mealTime);
 
-
     setState(() {
       _isLoading = false;
     });
-
   }
 
   @override
   void initState() {
-      _getMeal();
+    _getMeal();
     super.initState();
   }
 
@@ -93,7 +85,6 @@ class _MealScreenState extends State<MealScreen> {
   Widget build(BuildContext context) {
     ScreenUtil.instance = ScreenUtil.getInstance()..init(context);
     ScreenUtil.instance = ScreenUtil(allowFontScaling: true);
-
 
     if (_isLoading) {
       return Center(child: CircularProgressIndicator());
@@ -127,22 +118,29 @@ class _MealScreenState extends State<MealScreen> {
                           width: 100.0,
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(10.0),
-                            color: choose == true && (index == choose_index)? Colors.white :  Colors.blue,
+                            color: choose == true && (index == choose_index)
+                                ? Colors.white
+                                : Colors.blue,
                           ),
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: <Widget>[
                               Material(
-                                color: Colors.transparent,
+                                  color: Colors.transparent,
                                   child: InkWell(
                                     child: Text(
-                                      new DateFormat.yMMMd().format(mealTime[index]).toString(),
+                                      new DateFormat.yMMMd()
+                                          .format(mealTime[index])
+                                          .toString(),
                                       style: TextStyle(
-                                          color: choose == true && (index == choose_index)? Colors.blue : Colors.white,
+                                          color: choose == true &&
+                                                  (index == choose_index)
+                                              ? Colors.blue
+                                              : Colors.white,
                                           fontSize: 24.0,
                                           fontWeight: FontWeight.w600),
                                     ),
-                                    onTap: (){
+                                    onTap: () {
                                       breakfast = "Please add the meal";
                                       lunch = "Please add the meal";
                                       dinner = "Please add the meal";
@@ -150,20 +148,19 @@ class _MealScreenState extends State<MealScreen> {
                                       breakfastCalories = 0;
                                       lunchCalories = 0;
                                       dinnerCalories = 0;
-                                      for(var i = 0; i < list.length; i++) {
-                                        if (formatter.format(list[i].mealTime) == formatter.format(mealTime[index])) {
-
-                                          if(list[i].mealType == "breakfast"){
+                                      for (var i = 0; i < list.length; i++) {
+                                        if (formatter
+                                                .format(list[i].mealTime) ==
+                                            formatter.format(mealTime[index])) {
+                                          if (list[i].mealType == "breakfast") {
                                             breakfast = list[i].mealName;
-                                            breakfastCalories = list[i].calories;
-                                          }
-
-                                          else if(list[i].mealType == "lunch"){
+                                            breakfastCalories =
+                                                list[i].calories;
+                                          } else if (list[i].mealType ==
+                                              "lunch") {
                                             lunch = list[i].mealName;
                                             lunchCalories = list[i].calories;
-                                          }
-
-                                          else{
+                                          } else {
                                             dinner = list[i].mealName;
                                             dinnerCalories = list[i].calories;
                                           }
@@ -172,13 +169,10 @@ class _MealScreenState extends State<MealScreen> {
                                       setState(() {
                                         choose_index = index;
                                         mealTime.toSet().toList();
-
                                       });
-                                      choose=true;
+                                      choose = true;
                                     },
-                                  )
-                            )
-
+                                  ))
                             ],
                           ),
                         );
@@ -201,11 +195,14 @@ class _MealScreenState extends State<MealScreen> {
                     height: ScreenUtil.instance.setHeight(1500),
                     decoration: BoxDecoration(
                       color: Colors.blue,
-                      borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20)),
+                      borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(20),
+                          topRight: Radius.circular(20)),
                     ),
                   ),
                   ListView(
-                    padding: const EdgeInsets.only(top: 30, bottom: 15, left: 8,right: 8),
+                    padding: const EdgeInsets.only(
+                        top: 30, bottom: 15, left: 8, right: 8),
                     itemExtent: 106.0,
                     children: <CustomListItem>[
                       CustomListItem(
@@ -232,10 +229,14 @@ class _MealScreenState extends State<MealScreen> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: (){
-          Navigator.of(context).push(MaterialPageRoute(
-              builder: (BuildContext context) => NewMeal(id: widget.id,))).then((context){
-                _getMeal();
+        onPressed: () {
+          Navigator.of(context)
+              .push(MaterialPageRoute(
+                  builder: (BuildContext context) => NewMeal(
+                        id: widget.id,
+                      )))
+              .then((context) {
+            _getMeal();
           });
         },
         child: Icon(
@@ -244,7 +245,6 @@ class _MealScreenState extends State<MealScreen> {
           color: Colors.blue,
         ),
         backgroundColor: Colors.white,
-
       ),
     );
   }

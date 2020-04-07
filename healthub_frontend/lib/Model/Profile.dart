@@ -8,35 +8,24 @@ class Profile {
   int height;
   int count;
 
-  Profile(
-      {
-        @required this.gender,
-        @required this.age,
-        @required this.weights,
-        @required this.height,
-      }
-      );
+  Profile({
+    @required this.gender,
+    @required this.age,
+    @required this.weights,
+    @required this.height,
+  });
 
-  factory Profile.fromJson(Map<String, dynamic> parsedJson){
-
-    print(parsedJson['age']);
-
+  factory Profile.fromJson(Map<String, dynamic> parsedJson) {
     var list = parsedJson['weights'] as List;
-    print(list);
-    print(list.runtimeType);
 
     List<Weight> weightList = list.map((i) => Weight.fromJson(i)).toList();
-
-    print(weightList);
 
     return Profile(
         age: parsedJson['age'],
         height: parsedJson['height'],
         gender: parsedJson['gender'],
-        weights: weightList
-    );
+        weights: weightList);
   }
-
 
   Map<String, dynamic> toJson() {
     Map<String, dynamic> data = new Map<String, dynamic>();
