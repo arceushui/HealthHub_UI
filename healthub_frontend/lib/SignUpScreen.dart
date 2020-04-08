@@ -4,15 +4,11 @@ import 'package:healthub_frontend/main.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:http/http.dart' as http;
-import 'dart:async';
 import 'dart:convert';
 import 'package:email_validator/email_validator.dart';
 import 'package:flrx_validator/flrx_validator.dart';
 
 import 'Model/SIgnup.dart';
-
-
 
 class SignUpScreen extends StatefulWidget {
   // This widget is the root of your application.
@@ -25,14 +21,6 @@ class _MyAppState extends State<SignUpScreen> {
   SignupService get signService => GetIt.I<SignupService>();
 
   var _formkey = GlobalKey<FormState>();
-
-  Future<int> getUser(body) async{
-    print(body);
-    http.Response response = await http.post('http://localhost:8000/api/user/signup', body: body,headers: {"Content-Type": "application/json"},);
-    print(response.body);
-    print(response.statusCode);
-    return response.statusCode;
-  }
 
   TextEditingController usernameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
