@@ -1,5 +1,5 @@
 import 'package:healthub_frontend/Model/Activity.dart';
-import 'package:collection/collection.dart';
+
 
 class Activities {
   List<Activity> activities;

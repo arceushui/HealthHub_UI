@@ -1,12 +1,11 @@
 import 'dart:convert';
 
 import 'package:healthub_frontend/Model/SleepStore.dart';
-import 'package:healthub_frontend/Model/Sleep.dart';
 import 'package:healthub_frontend/Model/api_response.dart';
 import 'package:http/http.dart' as http;
 
 class SleepService {
-  static const API = 'http://192.168.1.233:8080';
+  static const API = 'http://10.0.2.2:8080';
   static const headers = {'Content-Type': 'application/json'};
 
   Future<APIResponse<SleepStore>> getSleepStore(String id) {

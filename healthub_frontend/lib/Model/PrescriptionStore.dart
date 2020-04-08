@@ -1,5 +1,4 @@
 import 'package:healthub_frontend/Model/Prescription.dart';
-import 'package:collection/collection.dart';
 
 class PrescriptionStore {
   List<Prescription> prescriptions;

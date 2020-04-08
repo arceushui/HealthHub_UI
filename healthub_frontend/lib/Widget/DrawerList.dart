@@ -7,6 +7,7 @@ import 'package:healthub_frontend/ActivitiesScreen.dart';
 import 'package:healthub_frontend/SleepScreen.dart';
 
 import '../MealScreen.dart';
+import '../main.dart';
 
 class DrawerList extends StatelessWidget {
   final String id;
@@ -16,7 +17,6 @@ class DrawerList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     print(id);
-    String _password;
     return Drawer(
       child: ListView(
         children: <Widget>[
@@ -91,12 +91,14 @@ class DrawerList extends StatelessWidget {
             },
           ),
           ListTile(
-            leading: Icon(Icons.forum),
-            title: Text("Dianogsis"),
-          ),
-          ListTile(
             leading: Icon(Icons.settings),
-            title: Text("Settings"),
+            title: Text("Log Out"),
+            onTap: () {
+              Navigator.of(context).pop();
+              Navigator.push(context, MaterialPageRoute(
+                  builder: (context) => MyApp()
+              ),);
+            },
           ),
         ],
       ),

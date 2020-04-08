@@ -107,7 +107,7 @@ class _PrescriptionScreenState extends State<PrescriptionScreen>
     Prescription _prescription = Prescription(
         prescriptionName: prescriptionNameController.text,
         instructions: instructionsController.text,
-        repeatDay: repeatDayController.text,
+        repeatDay: int.parse(repeatDayController.text),
         prescriptionUnit: prescriptionUnitController.text,
         startDate: confirmedStartDate,
         endDate: confirmedEndDate);
@@ -369,7 +369,7 @@ class _PrescriptionScreenState extends State<PrescriptionScreen>
                                       showTitleActions: true,
                                       minTime: DateTime.now()
                                           .subtract(new Duration(days: 365)),
-                                      maxTime: DateTime.now(),
+                                      maxTime: DateTime(2022, 12, 31),
                                       onChanged: (date) {}, onConfirm: (date) {
                                     confirmedStartDate = date.toString();
                                     print(
@@ -397,7 +397,7 @@ class _PrescriptionScreenState extends State<PrescriptionScreen>
                                       showTitleActions: true,
                                       minTime: DateTime.now()
                                           .subtract(new Duration(days: 365)),
-                                      maxTime: DateTime.now(),
+                                      maxTime: DateTime(2022, 12, 31),
                                       onChanged: (date) {}, onConfirm: (date) {
                                     confirmedEndDate = date.toString();
                                     endDateController.text =

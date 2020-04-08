@@ -237,6 +237,7 @@ class _MealScreenState extends State<MealScreen> {
                       )))
               .then((context) {
             _getMeal();
+            mealTime.toSet().toList();
           });
         },
         child: Icon(

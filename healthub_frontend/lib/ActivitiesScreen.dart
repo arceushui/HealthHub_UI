@@ -90,7 +90,7 @@ class _ActivitiesScreenState extends State<ActivitiesScreen> {
                 ),
                 Text(
                   activity.caloriBurned.toStringAsFixed(1) +
-                      " cal" +
+                      " kcal" +
                       " ★ " +
                       activity.duration.toStringAsFixed(1) +
                       "h",
@@ -170,7 +170,7 @@ class _ActivitiesScreenState extends State<ActivitiesScreen> {
                                 controller: caloriesController,
                                 decoration: const InputDecoration(
                                     hintText: '25',
-                                    labelText: 'Calories Burned',
+                                    labelText: 'Calories Burned (kcals)',
                                     labelStyle: TextStyle(fontSize: 15)),
                                 keyboardType: TextInputType.number,
                               ),

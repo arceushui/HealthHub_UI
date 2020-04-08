@@ -4,7 +4,7 @@ class Prescription {
   String instructions;
   String prescriptionUnit;
   String endDate;
-  String repeatDay;
+  int repeatDay;
 
   Prescription({
     this.prescriptionName,
